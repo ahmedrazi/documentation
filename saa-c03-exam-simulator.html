@@ -1,0 +1,1132 @@
+<title>AWS Solutions Architect Associate — Exam Simulator</title>
+<style>
+  /* ---------- Tokens ---------- */
+  :root {
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --surface-2: #EEF0F4;
+    --line: #DDE1E8;
+    --line-strong: #C7CCD6;
+    --ink: #1B2430;
+    --ink-soft: #47536407;
+    --muted: #5A6675;
+    --muted-2: #7A8698;
+    --accent: #EC7211;      /* AWS action orange, slightly deepened for light-bg contrast */
+    --accent-ink: #FFFFFF;
+    --navy: #232F3E;
+    --good: #1E874B;
+    --good-bg: #E4F3EA;
+    --bad: #C43D3D;
+    --bad-bg: #FBE7E7;
+    --flag: #B7791F;
+    --flag-bg: #FBF0DA;
+    --ring-track: #E3E7ED;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 8px 24px rgba(20,30,45,.06);
+    --shadow-sm: 0 1px 2px rgba(20,30,45,.08);
+    --radius: 14px;
+    --radius-sm: 9px;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12181F;
+      --surface: #1A222C;
+      --surface-2: #212B37;
+      --line: #2C3744;
+      --line-strong: #3A4756;
+      --ink: #EAEEF3;
+      --ink-soft: #B7C0CC;
+      --muted: #93A0AF;
+      --muted-2: #6E7C8C;
+      --accent: #FF9900;
+      --accent-ink: #1A1200;
+      --navy: #0E141B;
+      --good: #3FBE74;
+      --good-bg: #16301F;
+      --bad: #F0736F;
+      --bad-bg: #35191A;
+      --flag: #F2C062;
+      --flag-bg: #33290F;
+      --ring-track: #2A343F;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.35);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #F5F6F8; --surface: #FFFFFF; --surface-2: #EEF0F4; --line: #DDE1E8; --line-strong: #C7CCD6;
+    --ink: #1B2430; --ink-soft: #475364; --muted: #5A6675; --muted-2: #7A8698;
+    --accent: #EC7211; --accent-ink: #FFFFFF; --navy: #232F3E;
+    --good: #1E874B; --good-bg: #E4F3EA; --bad: #C43D3D; --bad-bg: #FBE7E7;
+    --flag: #B7791F; --flag-bg: #FBF0DA; --ring-track: #E3E7ED;
+    --shadow: 0 1px 2px rgba(20,30,45,.06), 0 8px 24px rgba(20,30,45,.06);
+  }
+  :root[data-theme="dark"] {
+    --bg: #12181F; --surface: #1A222C; --surface-2: #212B37; --line: #2C3744; --line-strong: #3A4756;
+    --ink: #EAEEF3; --ink-soft: #B7C0CC; --muted: #93A0AF; --muted-2: #6E7C8C;
+    --accent: #FF9900; --accent-ink: #1A1200; --navy: #0E141B;
+    --good: #3FBE74; --good-bg: #16301F; --bad: #F0736F; --bad-bg: #35191A;
+    --flag: #F2C062; --flag-bg: #33290F; --ring-track: #2A343F;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 30px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  button { font-family: inherit; cursor: pointer; }
+  .tnum { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  /* ---------- Top masthead ---------- */
+  .masthead {
+    background: var(--navy);
+    color: #fff;
+    border-bottom: 3px solid var(--accent);
+  }
+  .masthead .wrap { display: flex; align-items: center; gap: 14px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: .2px; }
+  .brand .cube {
+    width: 30px; height: 30px; border-radius: 7px;
+    background: linear-gradient(150deg, var(--accent), #ffb84d);
+    display: grid; place-items: center; color: #1a1200; font-weight: 800; font-size: 15px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+  }
+  .brand small { display: block; font-weight: 500; font-size: 11px; color: #9fb0c4; letter-spacing: .3px; }
+  .masthead .spacer { flex: 1; }
+  .exam-code {
+    font-family: var(--mono); font-size: 12px; color: #cdd7e2;
+    border: 1px solid rgba(255,255,255,.18); padding: 4px 9px; border-radius: 20px;
+  }
+  .icon-btn {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    color: #fff; width: 38px; height: 34px; border-radius: 8px; font-size: 15px;
+    display: grid; place-items: center; transition: background .15s;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,.16); }
+
+  /* ---------- Screens ---------- */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fade .35s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .screen.active { animation: none; } }
+
+  /* ---------- Start screen ---------- */
+  .hero { padding: 46px 0 26px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .hero h1 { font-size: clamp(28px, 4.4vw, 44px); line-height: 1.08; margin: 12px 0 10px; letter-spacing: -.02em; text-wrap: balance; }
+  .hero p.lede { font-size: 17px; color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 34px; }
+  .fact { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; box-shadow: var(--shadow-sm); }
+  .fact .k { font-family: var(--mono); font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+  .fact .l { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  .config { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px; margin-bottom: 40px; }
+  .config h2 { margin: 0 0 4px; font-size: 19px; letter-spacing: -.01em; }
+  .config .sub { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+  .field { margin-bottom: 24px; }
+  .field > label.head { display: block; font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+  .field .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+
+  .segmented { display: inline-flex; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+  .segmented button {
+    border: 0; background: transparent; color: var(--ink-soft); padding: 9px 16px; border-radius: 7px;
+    font-size: 14px; font-weight: 600; transition: all .15s; display: flex; align-items: center; gap: 8px;
+  }
+  .segmented button .desc { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .segmented button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+  :root[data-theme="dark"] .segmented button[aria-pressed="true"],
+  @media (prefers-color-scheme: dark) { }
+  .segmented button[aria-pressed="true"] .desc { color: var(--accent); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    padding: 8px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: all .15s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dc, var(--muted-2)); flex: none; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); color: var(--ink); }
+  .chip:hover { border-color: var(--line-strong); }
+
+  .count-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .count-opts button {
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft);
+    min-width: 58px; padding: 10px 8px; border-radius: 9px; font-family: var(--mono); font-weight: 600; font-size: 15px; transition: all .15s;
+  }
+  .count-opts button small { display: block; font-family: var(--sans); font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 1px; }
+  .count-opts button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--ink); }
+
+  .cta-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 22px; }
+  .btn-primary {
+    background: var(--accent); color: var(--accent-ink); border: 0; font-weight: 700; font-size: 15px;
+    padding: 13px 26px; border-radius: 10px; box-shadow: var(--shadow-sm); transition: transform .12s, filter .15s;
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn-primary:active { transform: translateY(1px); }
+  .cta-note { color: var(--muted); font-size: 13px; }
+
+  /* ---------- Exam workspace ---------- */
+  .statusbar {
+    position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(1.4) blur(8px); border-bottom: 1px solid var(--line);
+  }
+  .statusbar .wrap { display: flex; align-items: center; gap: 16px; height: 56px; }
+  .progress-meta { font-size: 13.5px; color: var(--muted); font-weight: 500; }
+  .progress-meta b { color: var(--ink); }
+  .pbar { flex: 1; height: 7px; background: var(--ring-track); border-radius: 20px; overflow: hidden; max-width: 340px; }
+  .pbar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #ffb84d); transition: width .3s; }
+  .timer { font-family: var(--mono); font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); }
+  .timer.warn { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
+  .timer .pulse { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity:.85; }
+
+  .work { display: grid; grid-template-columns: 1fr 260px; gap: 26px; padding: 28px 0 60px; align-items: start; }
+
+  .qcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px 30px; }
+  .qhead { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .qnum { font-family: var(--mono); font-size: 13px; color: var(--muted); font-weight: 600; }
+  .dtag { font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 20px; letter-spacing: .2px; background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 7px; }
+  .dtag .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .multi-badge { font-size: 11.5px; font-weight: 600; color: var(--accent); border: 1px dashed var(--accent); padding: 3px 9px; border-radius: 20px; }
+  .qflag-btn { margin-left: auto; background: transparent; border: 1px solid var(--line-strong); color: var(--muted); border-radius: 8px; padding: 6px 12px; font-size: 12.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all .15s; }
+  .qflag-btn[aria-pressed="true"] { color: var(--flag); border-color: var(--flag); background: var(--flag-bg); }
+
+  .stem { font-size: 17px; line-height: 1.6; color: var(--ink); margin: 0 0 22px; }
+
+  .options { display: flex; flex-direction: column; gap: 11px; }
+  .opt {
+    display: flex; align-items: flex-start; gap: 13px; padding: 14px 16px; border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm); background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s;
+    text-align: left; width: 100%; color: var(--ink); font-size: 15px; line-height: 1.5;
+  }
+  .opt:hover { border-color: var(--line-strong); background: var(--surface-2); }
+  .opt .marker {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--line-strong);
+    display: grid; place-items: center; font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--muted); transition: all .12s;
+  }
+  .opt.checkbox .marker { border-radius: 7px; }
+  .opt[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .opt[aria-pressed="true"] .marker { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .opt .otext { padding-top: 2px; }
+
+  /* graded states (practice + review) */
+  .opt.correct { border-color: var(--good); background: var(--good-bg); }
+  .opt.correct .marker { background: var(--good); border-color: var(--good); color: #fff; }
+  .opt.incorrect { border-color: var(--bad); background: var(--bad-bg); }
+  .opt.incorrect .marker { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .opt.disabled { pointer-events: none; }
+
+  .explain { margin-top: 20px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 15px 18px; display: none; }
+  .explain.show { display: block; animation: fade .25s ease; }
+  .explain .etag { font-size: 12px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+  .explain .etag.wrong { color: var(--bad); }
+  .explain .etag.right { color: var(--good); }
+  .explain p { margin: 0; font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+
+  .qnav-row { display: flex; align-items: center; gap: 12px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); flex-wrap: wrap; }
+  .btn-ghost { background: var(--surface); border: 1px solid var(--line-strong); color: var(--ink-soft); font-weight: 600; font-size: 14px; padding: 11px 18px; border-radius: 9px; transition: all .15s; }
+  .btn-ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
+  .btn-ghost:disabled { opacity: .4; cursor: not-allowed; }
+  .qnav-row .grow { flex: 1; }
+
+  /* Sidebar navigator */
+  .sidebar { position: sticky; top: 72px; }
+  .navcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 18px; }
+  .navcard h3 { margin: 0 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin: 12px 0 16px; font-size: 11.5px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1px solid var(--line-strong); }
+  .legend i.answered { background: var(--accent); border-color: var(--accent); }
+  .legend i.flagged { background: var(--flag-bg); border-color: var(--flag); }
+  .legend i.current { background: var(--surface); border: 2px solid var(--ink); }
+
+  .grid-nav { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; }
+  .gn {
+    aspect-ratio: 1; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 7px;
+    font-family: var(--mono); font-size: 12.5px; font-weight: 600; color: var(--ink-soft); position: relative; transition: all .12s;
+  }
+  .gn:hover { border-color: var(--accent); }
+  .gn.answered { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .gn.flagged::after { content: ""; position: absolute; top: -3px; right: -3px; width: 9px; height: 9px; border-radius: 50%; background: var(--flag); border: 1.5px solid var(--surface); }
+  .gn.current { box-shadow: 0 0 0 2px var(--ink); }
+  .navcard .submit-wrap { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .navcard .submit-wrap .status { font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+  .btn-submit { width: 100%; background: var(--good); color: #fff; border: 0; font-weight: 700; font-size: 14.5px; padding: 12px; border-radius: 9px; transition: filter .15s; }
+  .btn-submit:hover { filter: brightness(1.06); }
+
+  /* ---------- Results ---------- */
+  .results-head { padding: 40px 0 10px; text-align: center; }
+  .verdict-badge { display: inline-flex; align-items: center; gap: 9px; font-weight: 700; font-size: 13px; letter-spacing: .5px; text-transform: uppercase; padding: 7px 16px; border-radius: 20px; margin-bottom: 18px; }
+  .verdict-badge.pass { color: var(--good); background: var(--good-bg); }
+  .verdict-badge.fail { color: var(--bad); background: var(--bad-bg); }
+  .results-head h2 { font-size: 30px; margin: 0 0 6px; letter-spacing: -.02em; }
+  .results-head p { color: var(--muted); margin: 0; }
+
+  .score-panel { display: grid; grid-template-columns: 220px 1fr; gap: 30px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px; margin: 28px 0; align-items: center; }
+  .ring-wrap { display: grid; place-items: center; }
+  .ring { position: relative; width: 180px; height: 180px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+  .ring .center .pct { font-family: var(--mono); font-size: 40px; font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+  .ring .center .lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .score-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .sstat { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; }
+  .sstat .v { font-family: var(--mono); font-size: 24px; font-weight: 600; }
+  .sstat .k { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .sstat .v.good { color: var(--good); } .sstat .v.bad { color: var(--bad); }
+
+  .domain-breakdown { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 26px 28px; margin-bottom: 28px; }
+  .domain-breakdown h3 { margin: 0 0 18px; font-size: 16px; }
+  .dbar { margin-bottom: 16px; }
+  .dbar .top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 14px; }
+  .dbar .top .name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .dbar .top .name .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dbar .top .val { font-family: var(--mono); color: var(--muted); font-size: 13px; }
+  .dbar .track { height: 10px; background: var(--ring-track); border-radius: 20px; overflow: hidden; }
+  .dbar .track > i { display: block; height: 100%; border-radius: 20px; transition: width .6s ease; }
+
+  .results-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+
+  /* Review */
+  .review { display: none; margin-bottom: 60px; }
+  .review.show { display: block; }
+  .review h3 { font-size: 20px; margin: 10px 0 4px; }
+  .review .rsub { color: var(--muted); font-size: 14px; margin: 0 0 20px; }
+  .rfilter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .rfilter button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft); padding: 7px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+  .rfilter button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); color: var(--ink); }
+  .ritem { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 24px; margin-bottom: 14px; box-shadow: var(--shadow-sm); }
+  .ritem .rtop { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .ritem .rres { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; padding: 3px 10px; border-radius: 20px; }
+  .ritem .rres.right { color: var(--good); background: var(--good-bg); }
+  .ritem .rres.wrong { color: var(--bad); background: var(--bad-bg); }
+  .ritem .rres.skip { color: var(--muted); background: var(--surface-2); }
+  .ritem .rstem { font-weight: 600; font-size: 15.5px; margin: 0 0 14px; }
+  .ritem .ropt { font-size: 14px; padding: 9px 13px; border-radius: 8px; margin-bottom: 7px; display: flex; gap: 9px; border: 1px solid transparent; }
+  .ritem .ropt .m { font-family: var(--mono); font-weight: 700; flex: none; }
+  .ritem .ropt.right { background: var(--good-bg); color: var(--ink); border-color: color-mix(in srgb, var(--good) 40%, transparent); }
+  .ritem .ropt.chosen-wrong { background: var(--bad-bg); border-color: color-mix(in srgb, var(--bad) 40%, transparent); }
+  .ritem .ropt.muted { color: var(--muted); }
+  .ritem .rexp { margin-top: 12px; border-left: 3px solid var(--accent); background: var(--surface-2); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+  .ritem .rexp b { color: var(--ink); }
+
+  .foot { border-top: 1px solid var(--line); padding: 22px 0 40px; color: var(--muted-2); font-size: 12.5px; text-align: center; }
+  .foot b { color: var(--muted); }
+
+  @media (max-width: 860px) {
+    .facts { grid-template-columns: repeat(2, 1fr); }
+    .work { grid-template-columns: 1fr; }
+    .sidebar { position: static; order: -1; }
+    .grid-nav { grid-template-columns: repeat(10, 1fr); }
+    .score-panel { grid-template-columns: 1fr; }
+    .score-stats { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .facts { grid-template-columns: 1fr; }
+    .qcard { padding: 22px 18px; }
+    .score-stats { grid-template-columns: 1fr; }
+    .grid-nav { grid-template-columns: repeat(6, 1fr); }
+  }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <span class="cube">λ</span>
+      <span>Solutions Architect Prep<small>Associate · SAA-C03 practice engine</small></span>
+    </div>
+    <span class="spacer"></span>
+    <span class="exam-code">SAA-C03</span>
+    <button class="icon-btn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ START ============ -->
+  <section class="screen active" id="startScreen">
+    <div class="hero">
+      <span class="eyebrow">Exam Simulator</span>
+      <h1>Practice the AWS Solutions Architect Associate exam under real conditions.</h1>
+      <p class="lede">Scenario-based questions written in the style of SAA-C03, a live countdown timer, a flaggable question navigator, and per-domain scoring with a full explanation for every answer.</p>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><div class="k">65</div><div class="l">Questions on the real exam</div></div>
+      <div class="fact"><div class="k">130<span style="font-size:15px"> min</span></div><div class="l">Time allotted</div></div>
+      <div class="fact"><div class="k">720</div><div class="l">Passing score / 1000</div></div>
+      <div class="fact"><div class="k">4</div><div class="l">Weighted content domains</div></div>
+    </div>
+
+    <div class="config">
+      <h2>Configure your session</h2>
+      <p class="sub">Pick a mode, length, and which domains to drill. The question bank is sampled and shuffled on every attempt.</p>
+
+      <div class="field">
+        <label class="head">Mode</label>
+        <div class="segmented" id="modeSeg" role="group" aria-label="Mode">
+          <button data-mode="exam" aria-pressed="true">Exam mode <span class="desc">timed · feedback at the end</span></button>
+          <button data-mode="practice" aria-pressed="false">Practice mode <span class="desc">instant feedback + explanations</span></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="head">Length <span class="hint">— time budget is 2 min / question in exam mode</span></label>
+        <div class="count-opts" id="countSeg" role="group" aria-label="Question count">
+          <button data-count="10" aria-pressed="true">10<small>quick</small></button>
+          <button data-count="20" aria-pressed="false">20<small>focused</small></button>
+          <button data-count="0" aria-pressed="false" id="fullCount">All<small>full bank</small></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="head">Domains <span class="hint">— all selected covers the real weighting</span></label>
+        <div class="chips" id="domainChips" role="group" aria-label="Domains"></div>
+      </div>
+
+      <div class="cta-row">
+        <button class="btn-primary" id="startBtn">Start session →</button>
+        <span class="cta-note" id="startNote"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ EXAM ============ -->
+  <section class="screen" id="examScreen">
+    <div class="statusbar">
+      <div class="wrap">
+        <span class="progress-meta">Question <b id="curNum">1</b> / <span id="totNum">10</span></span>
+        <div class="pbar"><i id="pbarFill"></i></div>
+        <span class="spacer" style="flex:1"></span>
+        <div class="timer" id="timer"><span class="pulse"></span><span id="timerText">00:00</span></div>
+      </div>
+    </div>
+
+    <div class="work">
+      <div>
+        <div class="qcard" id="qcard"><!-- injected --></div>
+        <div class="qnav-row">
+          <button class="btn-ghost" id="prevBtn">← Previous</button>
+          <span class="grow"></span>
+          <button class="btn-ghost" id="nextBtn">Next →</button>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="navcard">
+          <h3>Navigator</h3>
+          <div class="legend">
+            <span><i class="answered"></i> Answered</span>
+            <span><i class="flagged"></i> Flagged</span>
+            <span><i class="current"></i> Current</span>
+          </div>
+          <div class="grid-nav" id="gridNav"></div>
+          <div class="submit-wrap">
+            <div class="status" id="answeredStatus">0 answered</div>
+            <button class="btn-submit" id="submitBtn">Submit exam</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section class="screen" id="resultsScreen">
+    <div class="results-head">
+      <div class="verdict-badge" id="verdictBadge"></div>
+      <h2 id="verdictTitle"></h2>
+      <p id="verdictSub"></p>
+    </div>
+
+    <div class="score-panel">
+      <div class="ring-wrap">
+        <div class="ring">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle cx="90" cy="90" r="78" fill="none" stroke="var(--ring-track)" stroke-width="14"/>
+            <circle id="ringArc" cx="90" cy="90" r="78" fill="none" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" stroke-dasharray="490" stroke-dashoffset="490"/>
+          </svg>
+          <div class="center">
+            <div class="pct tnum" id="scorePct">0%</div>
+            <div class="lab">scaled <span id="scoreScaled" class="tnum">0</span>/1000</div>
+          </div>
+        </div>
+      </div>
+      <div class="score-stats">
+        <div class="sstat"><div class="v good tnum" id="statCorrect">0</div><div class="k">Correct</div></div>
+        <div class="sstat"><div class="v bad tnum" id="statWrong">0</div><div class="k">Incorrect</div></div>
+        <div class="sstat"><div class="v tnum" id="statTime">0:00</div><div class="k">Time used</div></div>
+      </div>
+    </div>
+
+    <div class="domain-breakdown">
+      <h3>Performance by domain</h3>
+      <div id="domainBars"></div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn-primary" id="reviewBtn">Review all answers ↓</button>
+      <button class="btn-ghost" id="retryBtn">New session</button>
+    </div>
+
+    <div class="review" id="reviewSection">
+      <h3>Answer review</h3>
+      <p class="rsub">Correct answers are highlighted in green; your incorrect picks in red. Read the rationale — the exam rewards knowing <em>why</em>.</p>
+      <div class="rfilter" id="reviewFilter" role="group" aria-label="Filter review">
+        <button data-f="all" aria-pressed="true">All</button>
+        <button data-f="wrong" aria-pressed="false">Incorrect only</button>
+        <button data-f="flagged" aria-pressed="false">Flagged</button>
+      </div>
+      <div id="reviewList"></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Independent study aid · not affiliated with or endorsed by Amazon Web Services. <b>AWS</b> and all service names are trademarks of Amazon.com, Inc. Always confirm against the official AWS documentation.
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Domains ---------------- */
+  const DOMAINS = {
+    secure:  { name: "Secure Architectures",        weight: 30, color: "#E0658C" },
+    resilient:{ name: "Resilient Architectures",     weight: 26, color: "#6C8AE4" },
+    perf:    { name: "High-Performing Architectures", weight: 24, color: "#3FB6A8" },
+    cost:    { name: "Cost-Optimized Architectures",  weight: 20, color: "#E0913F" }
+  };
+
+  /* ---------------- Question bank ----------------
+     type: "single" | "multi" ; answer: index or array of indices */
+  const BANK = [
+    // ---- SECURE ----
+    { d:"secure", type:"single",
+      q:"An application running on an EC2 instance must read and write objects in an S3 bucket. Security policy forbids storing long-term credentials on the instance. What is the most secure way to grant this access?",
+      o:["Create an IAM user, generate access keys, and store them in the application's config file",
+         "Attach an IAM role with the required S3 permissions to the EC2 instance",
+         "Embed the root account access keys as environment variables on the instance",
+         "Place the credentials in an encrypted S3 object the instance downloads at boot"],
+      a:1,
+      e:"An IAM role attached to the instance supplies temporary, automatically-rotated credentials through the instance metadata service, so no long-lived keys are ever stored on the host. Access keys in a config file (A) and root keys (C) are exactly what the policy forbids." },
+
+    { d:"secure", type:"single",
+      q:"A company must encrypt data at rest in an Amazon RDS database and needs full control over the encryption key, including the ability to define rotation and audit its use via CloudTrail. Which service should be used to manage the key?",
+      o:["AWS Certificate Manager (ACM)",
+         "AWS Secrets Manager",
+         "AWS Key Management Service (KMS) customer managed key",
+         "AWS Systems Manager Parameter Store SecureString"],
+      a:2,
+      e:"A KMS customer managed key (CMK) gives you control over rotation policy and key policies, and every use is logged in CloudTrail. ACM manages TLS certificates, and Secrets Manager/Parameter Store store secrets — they do not perform RDS volume encryption." },
+
+    { d:"secure", type:"single",
+      q:"Objects in an S3 bucket must be reachable only from resources inside a specific VPC, with no traffic traversing the public internet. Which combination achieves this at the lowest cost?",
+      o:["A NAT gateway plus a bucket policy allowing the NAT's Elastic IP",
+         "An S3 gateway VPC endpoint plus a bucket policy that allows only the endpoint via aws:SourceVpce",
+         "AWS PrivateLink interface endpoint with a public bucket ACL",
+         "A VPN connection and a bucket policy allowing the customer gateway IP"],
+      a:1,
+      e:"An S3 gateway endpoint keeps traffic on the AWS network at no hourly/data cost, and a bucket policy conditioned on aws:SourceVpce restricts access to that VPC. A NAT gateway still routes to the public S3 endpoint and adds cost." },
+
+    { d:"secure", type:"single",
+      q:"A public-facing web application behind an Application Load Balancer is being hit by SQL injection attempts and needs protection against common web exploits, with the ability to create custom rules. Which service should be added?",
+      o:["Amazon GuardDuty","AWS Shield Standard","AWS WAF (Web Application Firewall)","Amazon Inspector"],
+      a:2,
+      e:"AWS WAF integrates with the ALB and lets you write rules (including managed rule groups) to block SQL injection, XSS, and other layer-7 exploits. GuardDuty detects threats but does not block requests; Shield Standard covers DDoS; Inspector assesses vulnerabilities." },
+
+    { d:"secure", type:"single",
+      q:"An account in Organization A must let an application in account B assume permissions to read a DynamoDB table, without sharing any static credentials. What is the correct approach?",
+      o:["Create an IAM user in account A and email the access keys to account B",
+         "Create an IAM role in account A with a trust policy allowing account B, and have B call sts:AssumeRole",
+         "Make the DynamoDB table public and filter by source IP",
+         "Enable a resource-based policy that references account B's console password"],
+      a:1,
+      e:"Cross-account access is done with an IAM role in the resource-owner account (A) that trusts the caller account (B). Principals in B assume the role via STS and receive short-lived credentials. Sharing static keys or making resources public violates least privilege." },
+
+    { d:"secure", type:"single",
+      q:"A team needs database credentials that are automatically rotated on a schedule and retrieved by applications at runtime through an API. Which service is purpose-built for this?",
+      o:["AWS Systems Manager Parameter Store (standard string)",
+         "AWS Secrets Manager",
+         "Amazon S3 with SSE-KMS",
+         "AWS KMS"],
+      a:1,
+      e:"Secrets Manager natively supports automatic, scheduled rotation (including built-in rotation for RDS) and runtime retrieval via API. Parameter Store standard strings do not rotate automatically, and KMS manages keys, not secret rotation." },
+
+    { d:"secure", type:"multi",
+      q:"A solutions architect must secure customer data both in transit and at rest for an application using an S3 bucket. Which TWO actions accomplish this? (Choose TWO.)",
+      o:["Enable S3 default encryption with SSE-KMS on the bucket",
+         "Enable S3 Transfer Acceleration",
+         "Enforce HTTPS by adding a bucket policy that denies requests where aws:SecureTransport is false",
+         "Enable S3 Versioning",
+         "Turn on S3 Requester Pays"],
+      a:[0,2],
+      e:"SSE-KMS encrypts data at rest, and a bucket policy denying aws:SecureTransport=false forces TLS for data in transit. Transfer Acceleration and Requester Pays affect performance/billing, and Versioning protects against overwrite/delete — none of them address encryption." },
+
+    { d:"secure", type:"single",
+      q:"A security team wants continuous, ML-based detection of anomalous activity such as unusual API calls or communication with known-malicious IPs across the AWS account. Which managed service should they enable?",
+      o:["AWS Config","Amazon GuardDuty","AWS Trusted Advisor","Amazon Macie"],
+      a:1,
+      e:"GuardDuty continuously analyzes CloudTrail, VPC Flow Logs, and DNS logs using ML and threat intelligence to surface anomalies. Config tracks resource compliance, Macie discovers sensitive data in S3, and Trusted Advisor gives best-practice checks." },
+
+    // ---- RESILIENT ----
+    { d:"resilient", type:"single",
+      q:"A web tier submits jobs to a processing tier. During traffic spikes the processing tier is overwhelmed and requests are lost. Which change decouples the tiers and buffers bursts most cost-effectively?",
+      o:["Place an Application Load Balancer between the tiers",
+         "Introduce an Amazon SQS queue that the processing tier polls",
+         "Move both tiers into a single larger EC2 instance",
+         "Use Amazon SNS to push each request to the processing tier"],
+      a:1,
+      e:"SQS decouples producers from consumers and absorbs bursts — messages wait in the queue until the processing tier (often behind Auto Scaling) can handle them, so nothing is lost. SNS is push-based fan-out with no durable buffering for a single consumer to drain at its own pace." },
+
+    { d:"resilient", type:"single",
+      q:"An application uses a single Amazon RDS instance. The business requires automatic failover to a standby with minimal downtime if the primary's Availability Zone fails. What should be configured?",
+      o:["Add an RDS read replica in the same AZ",
+         "Enable RDS Multi-AZ deployment",
+         "Take manual snapshots every hour",
+         "Enable storage auto scaling"],
+      a:1,
+      e:"Multi-AZ maintains a synchronous standby in a second AZ and fails over automatically via DNS if the primary fails. Read replicas scale reads and are asynchronous (not an automatic HA failover mechanism); snapshots and storage scaling don't provide automatic failover." },
+
+    { d:"resilient", type:"single",
+      q:"A stateless web application must remain available even if an entire Availability Zone goes down, and must scale with demand. Which architecture meets this?",
+      o:["A single large EC2 instance with an Elastic IP",
+         "An Auto Scaling group spanning multiple AZs behind an Application Load Balancer",
+         "Two EC2 instances in one AZ behind a Network Load Balancer",
+         "An EC2 instance with a Multi-AZ EBS volume"],
+      a:1,
+      e:"An Auto Scaling group across multiple AZs behind an ALB provides both horizontal scaling and AZ-level fault tolerance — if one AZ fails, the ALB routes to healthy instances in the others. Single-AZ or single-instance designs share a fault domain. (Note: EBS volumes are AZ-scoped, not Multi-AZ.)" },
+
+    { d:"resilient", type:"single",
+      q:"A message published by one system must be delivered simultaneously to several independent subscribers (an email service, a Lambda function, and an SQS queue). Which service provides this fan-out pattern?",
+      o:["Amazon SQS","Amazon SNS","Amazon MQ with a single queue","AWS Step Functions"],
+      a:1,
+      e:"SNS is a pub/sub service: one message published to a topic is delivered to all subscribers (Lambda, SQS, email, HTTP) at once. A common resilient pattern is SNS fan-out to multiple SQS queues. A single SQS queue delivers each message to only one consumer." },
+
+    { d:"resilient", type:"single",
+      q:"A DynamoDB-backed application must serve low-latency reads and writes to users in three geographic regions, with an active-active setup that survives a full regional outage. Which feature should be used?",
+      o:["DynamoDB Accelerator (DAX)","DynamoDB Global Tables","DynamoDB on-demand capacity","A DynamoDB read replica in each region"],
+      a:1,
+      e:"Global Tables provide multi-region, active-active replication so each region has a fully writable copy — surviving a regional failure and serving local low-latency traffic. DAX is an in-region cache; on-demand is a capacity mode; DynamoDB has no standalone 'read replica' construct." },
+
+    { d:"resilient", type:"multi",
+      q:"A company hosts a static website and needs it to be highly durable and highly available with global reach. Which TWO services together deliver this? (Choose TWO.)",
+      o:["Host the site on a single EC2 instance",
+         "Store the site's files in Amazon S3",
+         "Serve the content through Amazon CloudFront",
+         "Run the site from an on-premises server with a VPN",
+         "Store files on an EBS volume attached to one instance"],
+      a:[1,2],
+      e:"S3 gives eleven-nines durability and serves static assets without managing servers; CloudFront distributes that content from global edge locations for availability and low latency. A single EC2 instance or EBS volume is a single point of failure." },
+
+    { d:"resilient", type:"single",
+      q:"Automated, point-in-time backups of Amazon EBS volumes must be created and retained on a defined schedule with minimal operational effort. What should the architect use?",
+      o:["Copy the volume to another instance nightly with rsync",
+         "Amazon Data Lifecycle Manager to schedule and manage EBS snapshots",
+         "Enable EBS Multi-Attach",
+         "Store the data on instance store volumes"],
+      a:1,
+      e:"Amazon Data Lifecycle Manager (DLM) automates the creation, retention, and deletion of EBS snapshots (which are stored durably in S3) on a policy schedule. Multi-Attach shares a volume across instances; instance store is ephemeral." },
+
+    { d:"resilient", type:"single",
+      q:"A disaster recovery plan requires the lowest possible RTO and RPO for a critical application, and the business accepts higher cost to achieve it. Which DR strategy fits?",
+      o:["Backup and restore","Pilot light","Warm standby","Multi-site active/active"],
+      a:3,
+      e:"Multi-site active/active runs full production capacity in more than one Region simultaneously, giving near-zero RTO/RPO at the highest cost. Backup-and-restore has the highest RTO/RPO and lowest cost; pilot light and warm standby fall in between." },
+
+    // ---- PERFORMANCE ----
+    { d:"perf", type:"single",
+      q:"A global audience experiences high latency loading a website's images and videos hosted in S3 in one Region. Which service reduces latency by caching content close to users?",
+      o:["Amazon CloudFront","AWS Global Accelerator","Elastic Load Balancing","Amazon Route 53 latency routing only"],
+      a:0,
+      e:"CloudFront is a CDN that caches static and dynamic content at edge locations worldwide, cutting latency for global users. Global Accelerator improves network path performance but does not cache content; ELB is regional; Route 53 alone only resolves DNS." },
+
+    { d:"perf", type:"single",
+      q:"A read-heavy application repeatedly runs the same expensive queries against an RDS database, driving up load. Which addition most reduces read latency and offloads the database?",
+      o:["Increase the RDS instance's EBS volume size",
+         "Add an Amazon ElastiCache layer to cache frequent query results",
+         "Enable Multi-AZ on the database",
+         "Switch the database to magnetic storage"],
+      a:1,
+      e:"ElastiCache (Redis/Memcached) stores frequently requested results in memory for sub-millisecond retrieval, removing repeated load from the database. Multi-AZ is for availability, not read scaling; larger/magnetic storage does not cache queries." },
+
+    { d:"perf", type:"single",
+      q:"Dozens of Linux EC2 instances across multiple AZs must concurrently read and write to a single shared file system that scales automatically. Which storage service should be used?",
+      o:["Amazon EBS with Multi-Attach","Amazon S3 mounted as a drive","Amazon EFS","Instance store volumes"],
+      a:2,
+      e:"Amazon EFS is a fully managed, elastic NFS file system that many instances across AZs can mount and share simultaneously. EBS (even Multi-Attach) is AZ-scoped and limited in scope; S3 is object storage, not a POSIX file system; instance store is ephemeral and per-instance." },
+
+    { d:"perf", type:"single",
+      q:"A self-managed transactional database on EC2 needs consistently high IOPS and low-latency block storage with predictable performance. Which EBS volume type is most appropriate?",
+      o:["Cold HDD (sc1)","Throughput Optimized HDD (st1)","Provisioned IOPS SSD (io1/io2)","General Purpose SSD (gp2) capped at 100 IOPS"],
+      a:2,
+      e:"Provisioned IOPS SSD (io1/io2) is designed for I/O-intensive, latency-sensitive workloads like transactional databases, letting you provision a specific high IOPS level. HDD types (sc1/st1) are for throughput and cold data, not high-IOPS random access." },
+
+    { d:"perf", type:"single",
+      q:"Analysts need to run ad-hoc SQL queries directly against large volumes of log data stored in Amazon S3, without provisioning or managing any servers. Which service fits best?",
+      o:["Amazon Athena","Amazon Redshift with a large cluster","Amazon EMR with Hive","Run queries from an EC2 instance"],
+      a:0,
+      e:"Athena is serverless and queries data in place in S3 using standard SQL, billing per data scanned — ideal for ad-hoc analysis with zero infrastructure. Redshift and EMR require provisioning and managing clusters." },
+
+    { d:"perf", type:"single",
+      q:"Users worldwide upload large files to a single S3 bucket and experience slow, unreliable uploads over long distances. Which feature speeds up these uploads?",
+      o:["S3 Transfer Acceleration","S3 Cross-Region Replication","S3 Multipart download","Reduced Redundancy Storage"],
+      a:0,
+      e:"S3 Transfer Acceleration routes uploads over the AWS edge network and optimized backbone, accelerating long-distance transfers into the bucket. Cross-Region Replication copies existing objects between buckets; it does not speed client uploads." },
+
+    { d:"perf", type:"single",
+      q:"An application needs a fully managed, in-memory data store offering sub-millisecond latency for session data, with support for replication and persistence. Which should be chosen?",
+      o:["Amazon ElastiCache for Redis","Amazon RDS for MySQL","Amazon S3","Amazon DynamoDB Standard tables"],
+      a:0,
+      e:"ElastiCache for Redis is an in-memory store delivering sub-millisecond latency and supports replication, persistence, and clustering — well suited to session and caching workloads. RDS and DynamoDB are durable databases but not in-memory caches at that latency profile." },
+
+    // ---- COST ----
+    { d:"cost", type:"single",
+      q:"A company runs a steady, predictable production workload on EC2 24/7 and can commit for three years. Which purchasing option minimizes compute cost?",
+      o:["On-Demand Instances","Spot Instances","A Compute Savings Plan / Reserved Instances (3-year commitment)","Dedicated Hosts billed on demand"],
+      a:2,
+      e:"For steady, always-on workloads, a 3-year Savings Plan or Reserved Instance commitment yields the deepest discount (up to ~72%) versus On-Demand. Spot is cheapest but can be interrupted, unsuitable for steady production baselines that must always run." },
+
+    { d:"cost", type:"single",
+      q:"A stateless batch image-processing job is fault-tolerant and can be interrupted and resumed at any time. Which EC2 pricing model gives the greatest savings?",
+      o:["On-Demand Instances","Spot Instances","Reserved Instances (1-year, no upfront)","Dedicated Instances"],
+      a:1,
+      e:"Spot Instances offer up to ~90% off On-Demand and are ideal for fault-tolerant, interruptible workloads like batch processing that can resume after reclamation. Reserved/On-Demand cost more and are unnecessary for interruption-tolerant jobs." },
+
+    { d:"cost", type:"single",
+      q:"Data is accessed only a few times a year, but when it is requested it must be retrieved within milliseconds. Which S3 storage class minimizes cost while meeting this requirement?",
+      o:["S3 Standard","S3 Standard-Infrequent Access (Standard-IA)","S3 Glacier Flexible Retrieval","S3 Glacier Deep Archive"],
+      a:1,
+      e:"Standard-IA offers millisecond access at a lower storage price than Standard, in exchange for a per-GB retrieval fee — a good fit for infrequently accessed but immediately-needed data. Glacier classes are cheaper to store but have retrieval delays (minutes to hours)." },
+
+    { d:"cost", type:"single",
+      q:"Compliance data must be retained for seven years, is essentially never accessed, and a retrieval time of up to 12 hours is acceptable. Which S3 storage class is the most cost-effective?",
+      o:["S3 Standard-IA","S3 One Zone-IA","S3 Glacier Flexible Retrieval","S3 Glacier Deep Archive"],
+      a:3,
+      e:"Glacier Deep Archive is the lowest-cost S3 class, designed for long-term archives accessed once or twice a year where retrieval times of up to 12 hours are fine. The IA and Flexible Retrieval classes cost more to store for data that is essentially never read." },
+
+    { d:"cost", type:"single",
+      q:"An S3 bucket holds objects with unknown and changing access patterns. The team wants to reduce storage cost automatically without performance impact or retrieval fees for moving data. Which storage class should be used?",
+      o:["S3 Intelligent-Tiering","S3 Standard","Manually write Lifecycle rules by object age","S3 One Zone-IA"],
+      a:0,
+      e:"S3 Intelligent-Tiering automatically moves objects between access tiers based on observed usage, with no retrieval fees for the tier transitions and no operational overhead — ideal when access patterns are unknown or shifting. Age-based lifecycle rules assume a predictable pattern." },
+
+    { d:"cost", type:"single",
+      q:"Instances in private subnets download large volumes of data from Amazon S3 through a NAT gateway, and data-processing/transfer charges are high. What change reduces cost?",
+      o:["Increase the NAT gateway size",
+         "Replace the NAT gateway path to S3 with an S3 gateway VPC endpoint",
+         "Move the instances to public subnets with public IPs",
+         "Enable S3 Transfer Acceleration"],
+      a:1,
+      e:"An S3 gateway VPC endpoint lets private instances reach S3 directly over the AWS network, bypassing the NAT gateway and its per-GB processing charges — the endpoint itself is free. Moving instances to public subnets weakens security and doesn't address the underlying data path." },
+
+    { d:"cost", type:"multi",
+      q:"A finance team wants to monitor and control AWS spend proactively. Which TWO tools help them set alerts and analyze cost trends? (Choose TWO.)",
+      o:["AWS Budgets to alert when spend or usage crosses a threshold",
+         "Amazon CloudWatch Logs Insights",
+         "AWS Cost Explorer to visualize and forecast spending trends",
+         "AWS Config rules",
+         "Amazon Inspector"],
+      a:[0,2],
+      e:"AWS Budgets sends alerts when actual or forecast cost/usage exceeds thresholds, and Cost Explorer visualizes historical spend and forecasts trends. Config, Inspector, and CloudWatch Logs Insights address compliance, vulnerability, and log analysis — not cost management." }
+  ];
+
+  /* ---------------- State ---------------- */
+  const state = {
+    mode: "exam",
+    count: 10,
+    domains: new Set(Object.keys(DOMAINS)),
+    questions: [],
+    answers: {},     // idx -> array of selected option indices
+    flagged: new Set(),
+    current: 0,
+    startTime: 0,
+    timeLimit: 0,
+    remaining: 0,
+    timerId: null,
+    finished: false
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const el = (t, c) => { const n = document.createElement(t); if (c) n.className = c; return n; };
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const eq = (x, y) => { const p = [...x].sort(), r = [...y].sort(); return p.length === r.length && p.every((v, i) => v === r[i]); };
+  const fmt = (s) => { s = Math.max(0, Math.floor(s)); const m = Math.floor(s / 60), sec = s % 60; return String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0"); };
+  const letter = (i) => String.fromCharCode(65 + i);
+
+  /* ---------------- Theme ---------------- */
+  const themeBtn = $("themeBtn");
+  themeBtn.addEventListener("click", () => {
+    const root = document.documentElement;
+    const cur = root.getAttribute("data-theme");
+    const isDark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", isDark ? "light" : "dark");
+  });
+
+  /* ---------------- Start screen wiring ---------------- */
+  function buildChips() {
+    const box = $("domainChips");
+    box.innerHTML = "";
+    Object.entries(DOMAINS).forEach(([key, d]) => {
+      const b = el("button", "chip");
+      b.setAttribute("aria-pressed", "true");
+      b.dataset.dom = key;
+      b.style.setProperty("--dc", d.color);
+      b.innerHTML = '<span class="dot" style="background:' + d.color + '"></span>' + d.name + ' <span style="color:var(--muted);font-weight:600">' + d.weight + '%</span>';
+      b.addEventListener("click", () => {
+        const on = b.getAttribute("aria-pressed") === "true";
+        if (on && state.domains.size === 1) return; // keep at least one
+        b.setAttribute("aria-pressed", String(!on));
+        if (on) state.domains.delete(key); else state.domains.add(key);
+        updateStartNote();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  $("modeSeg").addEventListener("click", (e) => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    state.mode = btn.dataset.mode;
+    [...$("modeSeg").children].forEach(c => c.setAttribute("aria-pressed", String(c === btn)));
+    updateStartNote();
+  });
+
+  $("countSeg").addEventListener("click", (e) => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    state.count = parseInt(btn.dataset.count, 10);
+    [...$("countSeg").children].forEach(c => c.setAttribute("aria-pressed", String(c === btn)));
+    updateStartNote();
+  });
+
+  function availableCount() {
+    return BANK.filter(q => state.domains.has(q.d)).length;
+  }
+  function plannedCount() {
+    const avail = availableCount();
+    return state.count === 0 ? avail : Math.min(state.count, avail);
+  }
+  function updateStartNote() {
+    const n = plannedCount();
+    const mins = Math.round(n * 2);
+    const note = state.mode === "exam"
+      ? n + " questions · " + mins + " min timed · results at the end"
+      : n + " questions · instant feedback after each answer";
+    $("startNote").textContent = note;
+    $("fullCount").querySelector("small").textContent = availableCount() + " Qs";
+  }
+
+  $("startBtn").addEventListener("click", startSession);
+
+  /* ---------------- Session ---------------- */
+  function startSession() {
+    const pool = BANK.filter(q => state.domains.has(q.d));
+    const n = plannedCount();
+    state.questions = shuffle(pool).slice(0, n).map(q => {
+      // shuffle options, remap answer indices
+      const order = shuffle(q.o.map((_, i) => i));
+      const opts = order.map(i => q.o[i]);
+      const remap = (i) => order.indexOf(i);
+      const ans = Array.isArray(q.a) ? q.a.map(remap) : [remap(q.a)];
+      return { d: q.d, type: q.type, q: q.q, o: opts, a: ans, e: q.e };
+    });
+    state.answers = {};
+    state.flagged = new Set();
+    state.current = 0;
+    state.finished = false;
+    state.startTime = performance.now();
+    state.timeLimit = state.mode === "exam" ? state.questions.length * 120 : 0;
+    state.remaining = state.timeLimit;
+
+    $("totNum").textContent = state.questions.length;
+    buildGridNav();
+    showScreen("examScreen");
+    renderQuestion();
+    startTimer();
+    window.scrollTo(0, 0);
+  }
+
+  function startTimer() {
+    stopTimer();
+    const timerEl = $("timer"), txt = $("timerText");
+    const tick = () => {
+      const elapsed = (performance.now() - state.startTime) / 1000;
+      if (state.mode === "exam") {
+        state.remaining = state.timeLimit - elapsed;
+        txt.textContent = fmt(state.remaining);
+        timerEl.classList.toggle("warn", state.remaining <= 60);
+        if (state.remaining <= 0) { txt.textContent = "00:00"; finishExam(true); return; }
+      } else {
+        txt.textContent = fmt(elapsed);
+      }
+    };
+    tick();
+    state.timerId = setInterval(tick, 250);
+  }
+  function stopTimer() { if (state.timerId) { clearInterval(state.timerId); state.timerId = null; } }
+
+  /* ---------------- Render question ---------------- */
+  function renderQuestion() {
+    const i = state.current;
+    const q = state.questions[i];
+    const card = $("qcard");
+    const graded = state.mode === "practice" && state.answers[i] !== undefined;
+    const dom = DOMAINS[q.d];
+
+    card.innerHTML = "";
+    const head = el("div", "qhead");
+    head.innerHTML =
+      '<span class="qnum">Question ' + (i + 1) + '</span>' +
+      '<span class="dtag"><span class="dot" style="background:' + dom.color + '"></span>' + dom.name + '</span>' +
+      (q.type === "multi" ? '<span class="multi-badge">Choose ' + q.a.length + '</span>' : '');
+    const flagBtn = el("button", "qflag-btn");
+    flagBtn.setAttribute("aria-pressed", String(state.flagged.has(i)));
+    flagBtn.innerHTML = '⚑ ' + (state.flagged.has(i) ? "Flagged" : "Flag");
+    flagBtn.addEventListener("click", () => {
+      if (state.flagged.has(i)) state.flagged.delete(i); else state.flagged.add(i);
+      flagBtn.setAttribute("aria-pressed", String(state.flagged.has(i)));
+      flagBtn.innerHTML = '⚑ ' + (state.flagged.has(i) ? "Flagged" : "Flag");
+      buildGridNav();
+    });
+    head.appendChild(flagBtn);
+    card.appendChild(head);
+
+    const stem = el("p", "stem");
+    stem.textContent = q.q;
+    card.appendChild(stem);
+
+    const opts = el("div", "options");
+    const selected = state.answers[i] || [];
+    q.o.forEach((text, oi) => {
+      const b = el("button", "opt" + (q.type === "multi" ? " checkbox" : ""));
+      b.setAttribute("aria-pressed", String(selected.includes(oi)));
+      const marker = el("span", "marker");
+      marker.textContent = q.type === "multi" ? (selected.includes(oi) ? "✓" : "") : letter(oi);
+      const otext = el("span", "otext");
+      otext.textContent = text;
+      b.appendChild(marker); b.appendChild(otext);
+
+      if (graded) {
+        b.classList.add("disabled");
+        if (q.a.includes(oi)) b.classList.add("correct");
+        else if (selected.includes(oi)) b.classList.add("incorrect");
+      } else {
+        b.addEventListener("click", () => selectOption(i, oi));
+      }
+      opts.appendChild(b);
+    });
+    card.appendChild(opts);
+
+    // explanation (practice mode, after answering)
+    if (graded) {
+      const correct = eq(selected, q.a);
+      const ex = el("div", "explain show");
+      ex.innerHTML =
+        '<div class="etag ' + (correct ? "right" : "wrong") + '">' + (correct ? "✓ Correct" : "✗ Not quite") + '</div>' +
+        '<p><b>Answer: ' + q.a.map(a => letter(a)).sort().join(", ") + '.</b> ' + q.e + '</p>';
+      card.appendChild(ex);
+    }
+
+    // status bar
+    $("curNum").textContent = i + 1;
+    $("pbarFill").style.width = ((i + 1) / state.questions.length * 100) + "%";
+    $("prevBtn").disabled = i === 0;
+    $("nextBtn").disabled = i === state.questions.length - 1;
+    updateAnsweredStatus();
+    highlightGrid();
+  }
+
+  function selectOption(qi, oi) {
+    const q = state.questions[qi];
+    let sel = state.answers[qi] ? state.answers[qi].slice() : [];
+    if (q.type === "multi") {
+      if (sel.includes(oi)) sel = sel.filter(x => x !== oi);
+      else { if (sel.length >= q.a.length) sel.shift(); sel.push(oi); }
+      state.answers[qi] = sel;
+      renderQuestion(); // reflect check state (no grading until full in practice)
+      // In practice mode, only grade once the required number are chosen
+      if (state.mode === "practice" && sel.length === q.a.length) renderQuestion();
+    } else {
+      state.answers[qi] = [oi];
+      renderQuestion();
+    }
+    buildGridNav();
+  }
+
+  /* ---------------- Navigator ---------------- */
+  function buildGridNav() {
+    const g = $("gridNav");
+    g.innerHTML = "";
+    state.questions.forEach((_, i) => {
+      const b = el("button", "gn");
+      b.textContent = i + 1;
+      if (state.answers[i] !== undefined && state.answers[i].length) b.classList.add("answered");
+      if (state.flagged.has(i)) b.classList.add("flagged");
+      if (i === state.current) b.classList.add("current");
+      b.addEventListener("click", () => { state.current = i; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); });
+      g.appendChild(b);
+    });
+    updateAnsweredStatus();
+  }
+  function highlightGrid() {
+    [...$("gridNav").children].forEach((b, i) => b.classList.toggle("current", i === state.current));
+  }
+  function updateAnsweredStatus() {
+    const answered = Object.values(state.answers).filter(a => a && a.length).length;
+    $("answeredStatus").textContent = answered + " of " + state.questions.length + " answered";
+  }
+
+  $("prevBtn").addEventListener("click", () => { if (state.current > 0) { state.current--; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("nextBtn").addEventListener("click", () => { if (state.current < state.questions.length - 1) { state.current++; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  document.addEventListener("keydown", (e) => {
+    if (!$("examScreen").classList.contains("active")) return;
+    if (e.key === "ArrowRight") $("nextBtn").click();
+    if (e.key === "ArrowLeft") $("prevBtn").click();
+  });
+
+  $("submitBtn").addEventListener("click", () => {
+    const answered = Object.values(state.answers).filter(a => a && a.length).length;
+    const unanswered = state.questions.length - answered;
+    let msg = "Submit and end the session?";
+    if (unanswered > 0) msg = unanswered + " question(s) are unanswered. Submit anyway?";
+    if (confirm(msg)) finishExam(false);
+  });
+
+  /* ---------------- Results ---------------- */
+  function finishExam(timedOut) {
+    stopTimer();
+    state.finished = true;
+    const elapsed = (performance.now() - state.startTime) / 1000;
+    state.elapsedSec = state.mode === "exam" ? Math.min(elapsed, state.timeLimit) : elapsed;
+
+    let correct = 0;
+    const perDomain = {};
+    Object.keys(DOMAINS).forEach(k => perDomain[k] = { c: 0, t: 0 });
+    state.questions.forEach((q, i) => {
+      perDomain[q.d].t++;
+      const sel = state.answers[i] || [];
+      if (sel.length && eq(sel, q.a)) { correct++; perDomain[q.d].c++; }
+    });
+    const total = state.questions.length;
+    const pct = Math.round(correct / total * 100);
+    const scaled = Math.round(100 + (correct / total) * 900); // 100–1000 scale
+    const passed = scaled >= 720;
+
+    // verdict
+    const badge = $("verdictBadge");
+    badge.className = "verdict-badge " + (passed ? "pass" : "fail");
+    badge.innerHTML = (passed ? "● Pass" : "● Below passing");
+    $("verdictTitle").textContent = passed ? "Nicely done — you cleared the bar." : "Not there yet — keep drilling.";
+    $("verdictSub").textContent = (timedOut ? "Time expired. " : "") +
+      "You scored " + correct + " / " + total + " (" + pct + "%). The real exam passes at 720 / 1000.";
+
+    // ring
+    $("scorePct").textContent = pct + "%";
+    $("scoreScaled").textContent = scaled;
+    const circ = 2 * Math.PI * 78;
+    const arc = $("ringArc");
+    arc.style.strokeDasharray = circ;
+    arc.style.strokeDashoffset = circ;
+    arc.style.stroke = passed ? "var(--good)" : (pct >= 50 ? "var(--accent)" : "var(--bad)");
+    requestAnimationFrame(() => { setTimeout(() => { arc.style.transition = "stroke-dashoffset 1s ease"; arc.style.strokeDashoffset = circ * (1 - correct / total); }, 60); });
+
+    $("statCorrect").textContent = correct;
+    $("statWrong").textContent = total - correct;
+    $("statTime").textContent = fmt(state.elapsedSec);
+
+    // domain bars
+    const db = $("domainBars");
+    db.innerHTML = "";
+    Object.entries(DOMAINS).forEach(([k, d]) => {
+      const pd = perDomain[k];
+      if (pd.t === 0) return;
+      const p = Math.round(pd.c / pd.t * 100);
+      const bar = el("div", "dbar");
+      bar.innerHTML =
+        '<div class="top"><span class="name"><span class="dot" style="background:' + d.color + '"></span>' + d.name + '</span>' +
+        '<span class="val">' + pd.c + '/' + pd.t + ' · ' + p + '%</span></div>' +
+        '<div class="track"><i style="width:0%;background:' + d.color + '"></i></div>';
+      db.appendChild(bar);
+      requestAnimationFrame(() => setTimeout(() => { bar.querySelector("i").style.width = p + "%"; }, 80));
+    });
+
+    buildReview("all");
+    $("reviewSection").classList.remove("show");
+    $("reviewBtn").textContent = "Review all answers ↓";
+    showScreen("resultsScreen");
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------------- Review ---------------- */
+  $("reviewBtn").addEventListener("click", () => {
+    const sec = $("reviewSection");
+    const open = sec.classList.toggle("show");
+    $("reviewBtn").textContent = open ? "Hide review ↑" : "Review all answers ↓";
+    if (open) sec.scrollIntoView({ behavior: "smooth" });
+  });
+  $("retryBtn").addEventListener("click", () => { showScreen("startScreen"); window.scrollTo(0, 0); });
+  $("reviewFilter").addEventListener("click", (e) => {
+    const btn = e.target.closest("button"); if (!btn) return;
+    [...$("reviewFilter").children].forEach(c => c.setAttribute("aria-pressed", String(c === btn)));
+    buildReview(btn.dataset.f);
+  });
+
+  function buildReview(filter) {
+    const list = $("reviewList");
+    list.innerHTML = "";
+    let shown = 0;
+    state.questions.forEach((q, i) => {
+      const sel = state.answers[i] || [];
+      const isCorrect = sel.length && eq(sel, q.a);
+      const isSkipped = sel.length === 0;
+      if (filter === "wrong" && isCorrect) return;
+      if (filter === "flagged" && !state.flagged.has(i)) return;
+      shown++;
+
+      const item = el("div", "ritem");
+      const res = isSkipped ? "skip" : (isCorrect ? "right" : "wrong");
+      const resLabel = isSkipped ? "Skipped" : (isCorrect ? "Correct" : "Incorrect");
+      const dom = DOMAINS[q.d];
+      let html =
+        '<div class="rtop"><span class="qnum">Q' + (i + 1) + '</span>' +
+        '<span class="dtag"><span class="dot" style="background:' + dom.color + '"></span>' + dom.name + '</span>' +
+        (state.flagged.has(i) ? '<span class="multi-badge">⚑ flagged</span>' : '') +
+        '<span class="rres ' + res + '" style="margin-left:auto">' + resLabel + '</span></div>';
+      html += '<p class="rstem">' + escapeHtml(q.q) + '</p>';
+      q.o.forEach((text, oi) => {
+        const isAns = q.a.includes(oi);
+        const chosen = sel.includes(oi);
+        let cls = "ropt muted";
+        if (isAns) cls = "ropt right";
+        else if (chosen) cls = "ropt chosen-wrong";
+        const mk = isAns ? "✓" : (chosen ? "✗" : letter(oi));
+        html += '<div class="' + cls + '"><span class="m">' + mk + '</span><span>' + escapeHtml(text) +
+          (chosen && !isAns ? ' <em style="color:var(--bad)">— your answer</em>' : '') +
+          (isAns ? ' <em style="color:var(--good)">— correct answer</em>' : '') + '</span></div>';
+      });
+      html += '<div class="rexp"><b>Why:</b> ' + escapeHtml(q.e) + '</div>';
+      item.innerHTML = html;
+      list.appendChild(item);
+    });
+    if (shown === 0) list.innerHTML = '<p style="color:var(--muted);padding:20px 0">Nothing matches this filter.</p>';
+  }
+
+  function escapeHtml(s) { const d = el("div"); d.textContent = s; return d.innerHTML; }
+
+  /* ---------------- Screens ---------------- */
+  function showScreen(id) {
+    ["startScreen", "examScreen", "resultsScreen"].forEach(s => $(s).classList.toggle("active", s === id));
+  }
+
+  /* ---------------- Init ---------------- */
+  buildChips();
+  updateStartNote();
+})();
+</script>

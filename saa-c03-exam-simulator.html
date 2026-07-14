@@ -336,6 +336,67 @@
     .score-stats { grid-template-columns: 1fr; }
     .grid-nav { grid-template-columns: repeat(6, 1fr); }
   }
+
+  /* ---------- Resume banner ---------- */
+  .resume-banner {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 26px; box-shadow: var(--shadow-sm);
+  }
+  .resume-banner .rb-text { flex: 1; min-width: 220px; font-size: 14px; color: var(--ink-soft); }
+  .resume-banner .rb-text strong { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
+  .resume-banner .rb-actions { display: flex; gap: 10px; }
+  .btn-primary.sm { padding: 10px 18px; font-size: 14px; }
+
+  /* ---------- Pace indicator ---------- */
+  .pace { display: flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    background: var(--good-bg); color: var(--good); border: 1px solid color-mix(in srgb, var(--good) 40%, transparent); transition: all .3s; }
+  .pace .pdot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .pace.behind { background: var(--flag-bg); color: var(--flag); border-color: color-mix(in srgb, var(--flag) 45%, transparent); }
+  .pace.over { background: var(--bad-bg); color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, transparent); }
+  @media (max-width: 620px) { .pace { display: none !important; } }
+
+  /* ---------- Flashcards ---------- */
+  .flash-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; padding: 34px 0 14px; flex-wrap: wrap; }
+  .flash-head h2 { margin: 8px 0 0; font-size: 24px; letter-spacing: -.01em; }
+  .flash-head-actions { display: flex; gap: 10px; }
+  .pbar.full { max-width: none; width: 100%; margin-bottom: 22px; }
+
+  .flashcard { perspective: 1800px; margin-bottom: 22px; }
+  .fc-face {
+    width: 100%; text-align: left; background: transparent; border: 0; padding: 0; cursor: pointer;
+    display: block;
+  }
+  .fc-inner {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 30px 32px; min-height: 340px; transition: box-shadow .2s;
+  }
+  .fc-face:hover .fc-inner { box-shadow: var(--shadow), 0 0 0 1px var(--line-strong); }
+  .fc-face:focus-visible .fc-inner { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .fc-inner .fc-qhead { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .fc-inner .stem { font-size: 18px; line-height: 1.55; margin: 0 0 20px; }
+  .fc-opts { display: flex; flex-direction: column; gap: 9px; }
+  .fc-opt { display: flex; gap: 12px; padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); font-size: 15px; line-height: 1.5; transition: all .18s; }
+  .fc-opt .m { font-family: var(--mono); font-weight: 700; color: var(--muted); flex: none; }
+  .fc-opt.reveal-correct { background: var(--good-bg); border-color: var(--good); }
+  .fc-opt.reveal-correct .m { color: var(--good); }
+  .fc-reveal { margin-top: 20px; border-top: 1px dashed var(--line-strong); padding-top: 18px; animation: fade .3s ease; }
+  .fc-reveal .rtag { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--good); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .fc-reveal .ans { font-weight: 600; margin: 0 0 8px; font-size: 15px; }
+  .fc-reveal p { margin: 0; color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+  .fc-hint { text-align: center; color: var(--muted-2); font-size: 13px; margin-top: 16px; }
+  .fc-hint.hide { visibility: hidden; }
+
+  .flash-nav { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-bottom: 60px; }
+  .flash-nav .btn-ghost:first-child { justify-self: start; }
+  .flash-nav .btn-ghost:last-child { justify-self: end; }
+  .kbd { font-family: var(--mono); font-size: 11px; background: rgba(255,255,255,.18); padding: 2px 6px; border-radius: 5px; margin-left: 6px; }
+  @media (max-width: 560px) {
+    .flash-nav { grid-template-columns: 1fr 1fr; }
+    .flash-nav .btn-primary { grid-column: 1 / -1; order: -1; }
+    .kbd { display: none; }
+  }
 </style>
 
 <header class="masthead">
@@ -360,6 +421,17 @@
       <p class="lede">Scenario-based questions written in the style of SAA-C03, a live countdown timer, a flaggable question navigator, and per-domain scoring with a full explanation for every answer.</p>
     </div>
 
+    <div class="resume-banner" id="resumeBanner" hidden>
+      <div class="rb-text">
+        <strong>You have a session in progress.</strong>
+        <span id="resumeMeta">Pick up where you left off.</span>
+      </div>
+      <div class="rb-actions">
+        <button class="btn-ghost" id="discardBtn">Discard</button>
+        <button class="btn-primary sm" id="resumeBtn2">Resume session →</button>
+      </div>
+    </div>
+
     <div class="facts">
       <div class="fact"><div class="k">65</div><div class="l">Questions on the real exam</div></div>
       <div class="fact"><div class="k">130<span style="font-size:15px"> min</span></div><div class="l">Time allotted</div></div>
@@ -376,6 +448,7 @@
         <div class="segmented" id="modeSeg" role="group" aria-label="Mode">
           <button data-mode="exam" aria-pressed="true">Exam mode <span class="desc">timed · feedback at the end</span></button>
           <button data-mode="practice" aria-pressed="false">Practice mode <span class="desc">instant feedback + explanations</span></button>
+          <button data-mode="flash" aria-pressed="false">Flashcards <span class="desc">study answers &amp; rationale</span></button>
         </div>
       </div>
 
@@ -407,6 +480,7 @@
         <span class="progress-meta">Question <b id="curNum">1</b> / <span id="totNum">10</span></span>
         <div class="pbar"><i id="pbarFill"></i></div>
         <span class="spacer" style="flex:1"></span>
+        <div class="pace" id="pace" hidden><span class="pdot"></span><span id="paceText">On pace</span></div>
         <div class="timer" id="timer"><span class="pulse"></span><span id="timerText">00:00</span></div>
       </div>
     </div>
@@ -436,6 +510,33 @@
           </div>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <!-- ============ FLASHCARDS ============ -->
+  <section class="screen" id="flashScreen">
+    <div class="flash-head">
+      <div>
+        <span class="eyebrow">Flashcard study</span>
+        <h2 id="flashProgress">Card 1 of 10</h2>
+      </div>
+      <div class="flash-head-actions">
+        <button class="btn-ghost" id="flashShuffle" title="Reshuffle the deck">⇄ Shuffle</button>
+        <button class="btn-ghost" id="flashExit">Exit to menu</button>
+      </div>
+    </div>
+    <div class="pbar full"><i id="flashBar"></i></div>
+
+    <div class="flashcard" id="flashcard">
+      <button class="fc-face" id="fcClickable" aria-label="Reveal answer">
+        <div class="fc-inner" id="fcInner"><!-- injected --></div>
+      </button>
+    </div>
+
+    <div class="flash-nav">
+      <button class="btn-ghost" id="fcPrev">← Previous</button>
+      <button class="btn-primary" id="fcReveal">Reveal answer <span class="kbd">Space</span></button>
+      <button class="btn-ghost" id="fcNext">Next →</button>
     </div>
   </section>
 
@@ -1094,36 +1195,64 @@
   function updateStartNote() {
     const n = plannedCount();
     const mins = Math.round(n * 2);
-    const note = state.mode === "exam"
-      ? n + " questions · " + mins + " min timed · results at the end"
-      : n + " questions · instant feedback after each answer";
+    let note;
+    if (state.mode === "exam") note = n + " questions · " + mins + " min timed · results at the end";
+    else if (state.mode === "practice") note = n + " questions · instant feedback after each answer";
+    else note = n + " cards · flip to study the answer & rationale · no timer, no score";
     $("startNote").textContent = note;
+    $("startBtn").textContent = state.mode === "flash" ? "Start studying →" : "Start session →";
     $("fullCount").querySelector("small").textContent = availableCount() + " Qs";
   }
 
   $("startBtn").addEventListener("click", startSession);
 
-  /* ---------------- Session ---------------- */
-  function startSession() {
-    const pool = BANK.filter(q => state.domains.has(q.d));
-    const n = plannedCount();
-    state.questions = shuffle(pool).slice(0, n).map(q => {
-      // shuffle options, remap answer indices
-      const order = shuffle(q.o.map((_, i) => i));
-      const opts = order.map(i => q.o[i]);
-      const remap = (i) => order.indexOf(i);
-      const ans = Array.isArray(q.a) ? q.a.map(remap) : [remap(q.a)];
-      return { d: q.d, type: q.type, q: q.q, o: opts, a: ans, e: q.e };
-    });
-    state.answers = {};
-    state.flagged = new Set();
-    state.current = 0;
-    state.finished = false;
-    state.startTime = performance.now();
-    state.timeLimit = state.mode === "exam" ? state.questions.length * 120 : 0;
-    state.remaining = state.timeLimit;
+  /* ---------------- Persistence ---------------- */
+  const SKEY = "saa_c03_session_v1";
+  function saveState() {
+    if (state.finished || state.mode === "flash") return;
+    try {
+      const elapsed = (performance.now() - state.startTime) / 1000;
+      localStorage.setItem(SKEY, JSON.stringify({
+        mode: state.mode, questions: state.questions, answers: state.answers,
+        flagged: [...state.flagged], current: state.current,
+        elapsedSec: elapsed, timeLimit: state.timeLimit, savedAt: Date.now()
+      }));
+    } catch (e) { /* storage blocked — degrade silently */ }
+  }
+  function loadSaved() {
+    try { const raw = localStorage.getItem(SKEY); return raw ? JSON.parse(raw) : null; }
+    catch (e) { return null; }
+  }
+  function clearSaved() { try { localStorage.removeItem(SKEY); } catch (e) {} }
 
+  function maybeShowResume() {
+    const snap = loadSaved();
+    const banner = $("resumeBanner");
+    if (!snap || !snap.questions || !snap.questions.length) { banner.hidden = true; return; }
+    const answered = Object.values(snap.answers || {}).filter(a => a && a.length).length;
+    const modeLabel = snap.mode === "exam" ? "Exam mode" : "Practice mode";
+    let meta = modeLabel + " · " + answered + "/" + snap.questions.length + " answered";
+    if (snap.mode === "exam" && snap.timeLimit) {
+      meta += " · " + fmt(Math.max(0, snap.timeLimit - snap.elapsedSec)) + " left";
+    }
+    $("resumeMeta").textContent = meta;
+    banner.hidden = false;
+  }
+
+  function resumeSaved() {
+    const snap = loadSaved();
+    if (!snap) return;
+    state.mode = snap.mode;
+    state.questions = snap.questions;
+    state.answers = snap.answers || {};
+    state.flagged = new Set(snap.flagged || []);
+    state.current = snap.current || 0;
+    state.finished = false;
+    state.timeLimit = snap.timeLimit || 0;
+    state.startTime = performance.now() - (snap.elapsedSec || 0) * 1000;
+    state.remaining = state.timeLimit ? state.timeLimit - (snap.elapsedSec || 0) : 0;
     $("totNum").textContent = state.questions.length;
+    $("resumeBanner").hidden = true;
     buildGridNav();
     showScreen("examScreen");
     renderQuestion();
@@ -1131,22 +1260,124 @@
     window.scrollTo(0, 0);
   }
 
+  /* ---------------- Session ---------------- */
+  function buildDeck() {
+    const pool = BANK.filter(q => state.domains.has(q.d));
+    const n = plannedCount();
+    return shuffle(pool).slice(0, n).map(q => {
+      const order = shuffle(q.o.map((_, i) => i));
+      const opts = order.map(i => q.o[i]);
+      const remap = (i) => order.indexOf(i);
+      const ans = Array.isArray(q.a) ? q.a.map(remap) : [remap(q.a)];
+      return { d: q.d, type: q.type, q: q.q, o: opts, a: ans, e: q.e };
+    });
+  }
+
+  function startSession() {
+    state.questions = buildDeck();
+    state.current = 0;
+    state.finished = false;
+
+    if (state.mode === "flash") { startFlash(); return; }
+
+    state.answers = {};
+    state.flagged = new Set();
+    state.startTime = performance.now();
+    state.timeLimit = state.mode === "exam" ? state.questions.length * 120 : 0;
+    state.remaining = state.timeLimit;
+    clearSaved();
+
+    $("totNum").textContent = state.questions.length;
+    buildGridNav();
+    showScreen("examScreen");
+    renderQuestion();
+    startTimer();
+    saveState();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------------- Flashcards ---------------- */
+  function startFlash() {
+    state.fcRevealed = new Set();
+    $("pace").hidden = true;
+    showScreen("flashScreen");
+    renderFlash();
+    window.scrollTo(0, 0);
+  }
+  function renderFlash() {
+    const i = state.current;
+    const q = state.questions[i];
+    const dom = DOMAINS[q.d];
+    const revealed = state.fcRevealed.has(i);
+    $("flashProgress").textContent = "Card " + (i + 1) + " of " + state.questions.length;
+    $("flashBar").style.width = ((i + 1) / state.questions.length * 100) + "%";
+
+    let html = '<div class="fc-qhead"><span class="qnum">Card ' + (i + 1) + '</span>' +
+      '<span class="dtag"><span class="dot" style="background:' + dom.color + '"></span>' + dom.name + '</span>' +
+      (q.type === "multi" ? '<span class="multi-badge">Choose ' + q.a.length + '</span>' : '') + '</div>';
+    html += '<p class="stem">' + escapeHtml(q.q) + '</p><div class="fc-opts">';
+    q.o.forEach((t, oi) => {
+      const correct = revealed && q.a.includes(oi);
+      html += '<div class="fc-opt' + (correct ? " reveal-correct" : "") + '"><span class="m">' +
+        (correct ? "✓" : letter(oi)) + '</span><span>' + escapeHtml(t) + '</span></div>';
+    });
+    html += '</div>';
+    if (revealed) {
+      html += '<div class="fc-reveal"><div class="rtag">✓ Answer</div>' +
+        '<p class="ans">Correct: ' + q.a.map(a => letter(a)).sort().join(", ") + '</p>' +
+        '<p>' + escapeHtml(q.e) + '</p></div>';
+    } else {
+      html += '<p class="fc-hint">Tap the card or press <b>Space</b> to reveal the answer</p>';
+    }
+    $("fcInner").innerHTML = html;
+    $("fcReveal").innerHTML = revealed ? "Hide answer <span class=\"kbd\">Space</span>" : "Reveal answer <span class=\"kbd\">Space</span>";
+    $("fcPrev").disabled = i === 0;
+    $("fcNext").disabled = i === state.questions.length - 1;
+  }
+  function toggleReveal() {
+    const i = state.current;
+    if (state.fcRevealed.has(i)) state.fcRevealed.delete(i); else state.fcRevealed.add(i);
+    renderFlash();
+  }
+  function flashNav(delta) {
+    const t = state.current + delta;
+    if (t < 0 || t >= state.questions.length) return;
+    state.current = t;
+    renderFlash();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function startTimer() {
     stopTimer();
-    const timerEl = $("timer"), txt = $("timerText");
+    const timerEl = $("timer"), txt = $("timerText"), paceEl = $("pace"), paceTxt = $("paceText");
+    paceEl.hidden = state.mode !== "exam";
+    let lastSave = performance.now();
     const tick = () => {
       const elapsed = (performance.now() - state.startTime) / 1000;
       if (state.mode === "exam") {
         state.remaining = state.timeLimit - elapsed;
         txt.textContent = fmt(state.remaining);
         timerEl.classList.toggle("warn", state.remaining <= 60);
-        if (state.remaining <= 0) { txt.textContent = "00:00"; finishExam(true); return; }
+        updatePace(elapsed, paceEl, paceTxt);
+        if (state.remaining <= 0) { txt.textContent = "00:00"; clearSaved(); finishExam(true); return; }
       } else {
         txt.textContent = fmt(elapsed);
       }
+      if (performance.now() - lastSave > 4000) { saveState(); lastSave = performance.now(); }
     };
     tick();
     state.timerId = setInterval(tick, 250);
+  }
+
+  // Budget is 120s/question. Pace judged on average time per answered question.
+  function updatePace(elapsed, paceEl, paceTxt) {
+    const answered = Object.values(state.answers).filter(a => a && a.length).length;
+    paceEl.classList.remove("behind", "over");
+    if (answered === 0) { paceTxt.textContent = "On pace"; return; }
+    const avg = elapsed / answered;
+    if (avg > 140) { paceEl.classList.add("over"); paceTxt.textContent = "Behind · " + Math.round(avg) + "s/Q"; }
+    else if (avg > 120) { paceEl.classList.add("behind"); paceTxt.textContent = "Watch pace · " + Math.round(avg) + "s/Q"; }
+    else { paceTxt.textContent = "On pace · " + Math.round(avg) + "s/Q"; }
   }
   function stopTimer() { if (state.timerId) { clearInterval(state.timerId); state.timerId = null; } }
 
@@ -1172,6 +1403,7 @@
       flagBtn.setAttribute("aria-pressed", String(state.flagged.has(i)));
       flagBtn.innerHTML = '⚑ ' + (state.flagged.has(i) ? "Flagged" : "Flag");
       buildGridNav();
+      saveState();
     });
     head.appendChild(flagBtn);
     card.appendChild(head);
@@ -1236,6 +1468,7 @@
       renderQuestion();
     }
     buildGridNav();
+    saveState();
   }
 
   /* ---------------- Navigator ---------------- */
@@ -1261,12 +1494,36 @@
     $("answeredStatus").textContent = answered + " of " + state.questions.length + " answered";
   }
 
-  $("prevBtn").addEventListener("click", () => { if (state.current > 0) { state.current--; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
-  $("nextBtn").addEventListener("click", () => { if (state.current < state.questions.length - 1) { state.current++; renderQuestion(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("prevBtn").addEventListener("click", () => { if (state.current > 0) { state.current--; renderQuestion(); saveState(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("nextBtn").addEventListener("click", () => { if (state.current < state.questions.length - 1) { state.current++; renderQuestion(); saveState(); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+
+  // Flashcard controls
+  $("fcReveal").addEventListener("click", toggleReveal);
+  $("fcClickable").addEventListener("click", toggleReveal);
+  $("fcPrev").addEventListener("click", () => flashNav(-1));
+  $("fcNext").addEventListener("click", () => flashNav(1));
+  $("flashExit").addEventListener("click", () => { showScreen("startScreen"); maybeShowResume(); window.scrollTo(0, 0); });
+  $("flashShuffle").addEventListener("click", () => {
+    state.questions = shuffle(state.questions);
+    state.fcRevealed = new Set();
+    state.current = 0;
+    renderFlash();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // Resume banner
+  $("resumeBtn2").addEventListener("click", resumeSaved);
+  $("discardBtn").addEventListener("click", () => { clearSaved(); $("resumeBanner").hidden = true; });
+
   document.addEventListener("keydown", (e) => {
-    if (!$("examScreen").classList.contains("active")) return;
-    if (e.key === "ArrowRight") $("nextBtn").click();
-    if (e.key === "ArrowLeft") $("prevBtn").click();
+    if ($("examScreen").classList.contains("active")) {
+      if (e.key === "ArrowRight") $("nextBtn").click();
+      if (e.key === "ArrowLeft") $("prevBtn").click();
+    } else if ($("flashScreen").classList.contains("active")) {
+      if (e.key === "ArrowRight") flashNav(1);
+      if (e.key === "ArrowLeft") flashNav(-1);
+      if (e.key === " " || e.key === "Spacebar") { e.preventDefault(); toggleReveal(); }
+    }
   });
 
   $("submitBtn").addEventListener("click", () => {
@@ -1281,6 +1538,7 @@
   function finishExam(timedOut) {
     stopTimer();
     state.finished = true;
+    clearSaved();
     const elapsed = (performance.now() - state.startTime) / 1000;
     state.elapsedSec = state.mode === "exam" ? Math.min(elapsed, state.timeLimit) : elapsed;
 
@@ -1400,11 +1658,12 @@
 
   /* ---------------- Screens ---------------- */
   function showScreen(id) {
-    ["startScreen", "examScreen", "resultsScreen"].forEach(s => $(s).classList.toggle("active", s === id));
+    ["startScreen", "examScreen", "flashScreen", "resultsScreen"].forEach(s => $(s).classList.toggle("active", s === id));
   }
 
   /* ---------------- Init ---------------- */
   buildChips();
   updateStartNote();
+  maybeShowResume();
 })();
 </script>

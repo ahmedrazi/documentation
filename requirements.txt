@@ -1,0 +1,3 @@
+# NX-OS Compliance Checker -- runtime dependencies
+# The checker itself needs only PyYAML; everything else is Python stdlib.
+PyYAML>=6.0

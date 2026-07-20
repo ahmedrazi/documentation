@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NX-OS Compliance Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #171e2e; --panel2: #1e2740; --line: #2a3550;
+    --fg: #e6ebf5; --muted: #8b97b3; --accent: #4f8cff;
+    --crit: #e5484d; --high: #f5a524; --med: #4f8cff; --low: #8b97b3;
+    --A: #30a46c; --B: #59b98a; --C: #f5a524; --D: #f0803c; --F: #e5484d;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 20px 28px; border-bottom: 1px solid var(--line);
+    display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 20px; margin: 0; font-weight: 600; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .src { margin-left: auto; color: var(--muted); font-size: 12px; }
+  main { padding: 24px 28px; max-width: 1280px; margin: 0 auto; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(4, 1fr); }
+  .panel { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 18px; }
+  .panel h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--muted); margin: 0 0 14px; font-weight: 600; }
+  .stat { font-size: 34px; font-weight: 700; }
+  .stat small { font-size: 13px; color: var(--muted); font-weight: 400; }
+  .col-2 { grid-column: span 2; } .col-3 { grid-column: span 3; }
+  .col-4 { grid-column: span 4; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .03em; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .badge { display: inline-block; min-width: 22px; text-align: center;
+    padding: 2px 8px; border-radius: 6px; font-weight: 700; color: #0b0f18; }
+  .pill { padding: 1px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .pill.FAIL { background: rgba(229,72,77,.15); color: #ff7b7f; }
+  .pill.PASS { background: rgba(48,164,108,.15); color: #4bd08a; }
+  .pill.ERROR{ background: rgba(245,165,36,.15); color: #f5a524; }
+  .sev-CRITICAL { color: var(--crit); font-weight: 700; }
+  .sev-HIGH { color: var(--high); font-weight: 700; }
+  .sev-MEDIUM { color: var(--med); }
+  .sev-LOW { color: var(--low); }
+  .bar { height: 22px; border-radius: 4px; display: inline-block; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px;
+    color: var(--muted); font-size: 12px; }
+  .legend span b { display: inline-block; width: 10px; height: 10px;
+    border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .rowbtn { cursor: pointer; }
+  .rowbtn:hover { background: var(--panel2); }
+  .detail td { background: var(--panel2); font-size: 12px; color: var(--muted); }
+  .detail .fix { color: var(--accent); }
+  .empty { color: var(--muted); padding: 40px; text-align: center; }
+  .filterow { margin: 0 0 16px; display: flex; gap: 8px; align-items: center;
+    flex-wrap: wrap; }
+  select, input { background: var(--panel2); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font: inherit; }
+  footer { color: var(--muted); font-size: 12px; padding: 20px 28px;
+    border-top: 1px solid var(--line); }
+  code { background: var(--panel2); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NX-OS Compliance Dashboard</h1>
+  <span class="sub">Splunk-style view of NDJSON scan output</span>
+  <span class="src" id="src"></span>
+</header>
+<main>
+  <div id="app"><div class="empty">Loading <code>compliance.ndjson</code>&hellip;</div></div>
+</main>
+<footer>
+  Single-box deployment &middot; reads the same NDJSON a Splunk forwarder ingests.
+  Regenerate with <code>make scan</code> or
+  <code>python3 src/nxos_compliance_checker.py --config-dir configs --format ndjson --output dashboard/compliance.ndjson</code>.
+</footer>
+
+<script>
+const GRADE_COLORS = { A:'#30a46c', B:'#59b98a', C:'#f5a524', D:'#f0803c', F:'#e5484d' };
+const SEV_COLORS = { CRITICAL:'#e5484d', HIGH:'#f5a524', MEDIUM:'#4f8cff', LOW:'#8b97b3' };
+const SEV_ORDER = ['CRITICAL','HIGH','MEDIUM','LOW'];
+
+// Try both layouts: native (ndjson copied next to index.html) and the
+// docker-compose dashboard service (output/ mounted under the web root).
+const NDJSON_PATHS = ['compliance.ndjson', 'output/compliance.ndjson'];
+
+async function load() {
+  let text;
+  for (const path of NDJSON_PATHS) {
+    try {
+      const res = await fetch(path, { cache: 'no-store' });
+      if (res.ok) { text = await res.text(); break; }
+    } catch (e) { /* try next path */ }
+  }
+  if (text == null) {
+    document.getElementById('app').innerHTML =
+      '<div class="empty">Could not load <code>compliance.ndjson</code>.<br>' +
+      'Generate it first (<code>make scan</code>), then serve this folder with ' +
+      '<code>python3 -m http.server</code>.</div>';
+    return;
+  }
+  const events = text.split('\n').filter(Boolean).map(l => JSON.parse(l));
+  render(events);
+}
+
+function render(events) {
+  const summaries = events.filter(e => e.event_type === 'compliance_summary');
+  const checks = events.filter(e => e.event_type === 'compliance_check');
+  if (!summaries.length) {
+    document.getElementById('app').innerHTML = '<div class="empty">No summary events found.</div>';
+    return;
+  }
+  document.getElementById('src').textContent =
+    summaries.length + ' device(s) · scanned ' + (summaries[0].scanned_at || '').slice(0,19).replace('T',' ') + ' UTC';
+
+  const totalChecks = summaries.reduce((a,s)=>a+s.total_checks,0);
+  const totalFail = summaries.reduce((a,s)=>a+s.failed,0);
+  const avg = (summaries.reduce((a,s)=>a+s.percentage,0)/summaries.length).toFixed(1);
+  const sevTotals = { CRITICAL:0, HIGH:0, MEDIUM:0, LOW:0 };
+  summaries.forEach(s => SEV_ORDER.forEach(k => sevTotals[k]+=(s.severity_failures?.[k]||0)));
+  const gradeDist = {};
+  summaries.forEach(s => gradeDist[s.grade] = (gradeDist[s.grade]||0)+1);
+
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="grid" style="margin-bottom:18px">
+      <div class="panel"><h2>Devices</h2><div class="stat">${summaries.length}</div></div>
+      <div class="panel"><h2>Avg Score</h2><div class="stat">${avg}<small>%</small></div></div>
+      <div class="panel"><h2>Total Failures</h2><div class="stat">${totalFail}<small> / ${totalChecks}</small></div></div>
+      <div class="panel"><h2>Critical Failures</h2><div class="stat" style="color:var(--crit)">${sevTotals.CRITICAL}</div></div>
+    </div>
+    <div class="grid" style="margin-bottom:18px">
+      <div class="panel col-2"><h2>Grade Distribution</h2>${gradeBars(gradeDist, summaries.length)}</div>
+      <div class="panel col-2"><h2>Failures by Severity</h2>${sevBars(sevTotals)}</div>
+    </div>
+    <div class="panel col-4" style="margin-bottom:18px">
+      <h2>Device Summary</h2>${deviceTable(summaries)}
+    </div>
+    <div class="panel col-4">
+      <h2>Failing Checks — Drilldown</h2>
+      <div class="filterow">
+        <label>Device <select id="fDevice"><option value="">all</option>${
+          summaries.map(s=>`<option>${esc(s.hostname)}</option>`).join('')}</select></label>
+        <label>Severity <select id="fSev"><option value="">all</option>${
+          SEV_ORDER.map(s=>`<option>${s}</option>`).join('')}</select></label>
+        <label>Search <input id="fText" placeholder="check id / text" /></label>
+      </div>
+      <div id="checkTable"></div>
+    </div>`;
+
+  const fails = checks.filter(c => c.status !== 'PASS');
+  const draw = () => {
+    const dev = document.getElementById('fDevice').value;
+    const sev = document.getElementById('fSev').value;
+    const q = document.getElementById('fText').value.toLowerCase();
+    const rows = fails.filter(c =>
+      (!dev || c.hostname===dev) && (!sev || c.severity===sev) &&
+      (!q || (c.check_id+c.description+c.category).toLowerCase().includes(q)));
+    document.getElementById('checkTable').innerHTML = checkTable(rows);
+  };
+  ['fDevice','fSev','fText'].forEach(id =>
+    document.getElementById(id).addEventListener('input', draw));
+  draw();
+}
+
+function gradeBars(dist, total) {
+  const rows = ['A','B','C','D','F'].map(g => {
+    const n = dist[g]||0, pct = total ? (100*n/total) : 0;
+    return `<div style="display:flex;align-items:center;gap:10px;margin:6px 0">
+      <span class="badge" style="background:${GRADE_COLORS[g]}">${g}</span>
+      <span class="bar" style="width:${Math.max(pct,2)}%;background:${GRADE_COLORS[g]}"></span>
+      <span style="color:var(--muted)">${n}</span></div>`;
+  }).join('');
+  return rows;
+}
+
+function sevBars(t) {
+  const max = Math.max(1, ...SEV_ORDER.map(k=>t[k]));
+  return SEV_ORDER.map(k =>
+    `<div style="display:flex;align-items:center;gap:10px;margin:6px 0">
+      <span class="sev-${k}" style="width:80px;display:inline-block">${k}</span>
+      <span class="bar" style="width:${Math.max(6,100*t[k]/max)}%;background:${SEV_COLORS[k]}"></span>
+      <span style="color:var(--muted)">${t[k]}</span></div>`).join('');
+}
+
+function deviceTable(summaries) {
+  const body = summaries.map(s => `
+    <tr>
+      <td>${esc(s.hostname)}</td>
+      <td><span class="badge" style="background:${GRADE_COLORS[s.grade]||'#888'}">${s.grade}</span></td>
+      <td class="num">${s.percentage}%</td>
+      <td class="num">${s.passed}</td>
+      <td class="num">${s.failed}</td>
+      <td class="num sev-CRITICAL">${s.severity_failures?.CRITICAL||0}</td>
+      <td class="num sev-HIGH">${s.severity_failures?.HIGH||0}</td>
+      <td class="num sev-MEDIUM">${s.severity_failures?.MEDIUM||0}</td>
+      <td class="num sev-LOW">${s.severity_failures?.LOW||0}</td>
+    </tr>`).join('');
+  return `<table><thead><tr>
+    <th>Hostname</th><th>Grade</th><th class="num">Score</th>
+    <th class="num">Pass</th><th class="num">Fail</th>
+    <th class="num">Crit</th><th class="num">High</th>
+    <th class="num">Med</th><th class="num">Low</th>
+    </tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function checkTable(rows) {
+  if (!rows.length) return '<div class="empty">No matching failures. 🎉</div>';
+  const body = rows.map((c,i) => `
+    <tr class="rowbtn" data-i="${i}">
+      <td><span class="pill ${c.status}">${c.status}</span></td>
+      <td class="sev-${c.severity}">${c.severity}</td>
+      <td>${esc(c.check_id)}</td>
+      <td>${esc(c.category)}</td>
+      <td>${esc(c.hostname)}</td>
+      <td>${esc(c.description)}</td>
+    </tr>
+    <tr class="detail" id="d${i}" style="display:none"><td colspan="6">
+      <div>${esc(c.message)}</div>
+      ${c.remediation ? `<div class="fix">fix: ${esc(c.remediation)}</div>` : ''}
+    </td></tr>`).join('');
+  const html = `<table><thead><tr>
+    <th>Status</th><th>Severity</th><th>Check</th><th>Category</th>
+    <th>Device</th><th>Description</th></tr></thead><tbody>${body}</tbody></table>`;
+  return html;
+}
+
+// event delegation for drilldown expand
+document.addEventListener('click', e => {
+  const row = e.target.closest('.rowbtn');
+  if (!row) return;
+  const d = document.getElementById('d'+row.dataset.i);
+  if (d) d.style.display = d.style.display === 'none' ? '' : 'none';
+});
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,
+  c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+load();
+</script>
+</body>
+</html>

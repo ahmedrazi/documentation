@@ -1,0 +1,25 @@
+{
+  "title": "NX-OS Compliance Checker on a Single Linux Box",
+  "description": "Deploy the automated NX-OS security compliance auditor -- scanner, scoring, NDJSON output, and a Splunk-style dashboard -- on one Ubuntu node.",
+  "details": {
+    "intro": {
+      "text": "intro.md",
+      "background": "prepare.sh"
+    },
+    "steps": [
+      { "title": "Install & first scan", "text": "step1.md" },
+      { "title": "Read the compliance report", "text": "step2.md" },
+      { "title": "Open the dashboard", "text": "step3.md" },
+      { "title": "Edit policy & re-scan", "text": "step4.md" }
+    ],
+    "finish": {
+      "text": "finish.md"
+    }
+  },
+  "backend": {
+    "imageid": "ubuntu"
+  },
+  "interface": {
+    "layout": "ide"
+  }
+}

@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+output
+dashboard/compliance.ndjson
+killercoda
+*.pptx

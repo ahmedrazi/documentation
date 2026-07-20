@@ -1,0 +1,15 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated scan output
+output/*.ndjson
+output/*.json
+output/*.csv
+dashboard/compliance.ndjson
+
+# OS / editor
+.DS_Store
+*.swp

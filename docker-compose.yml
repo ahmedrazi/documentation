@@ -1,0 +1,62 @@
+# =============================================================================
+# Single-box deployment for the NX-OS Compliance Checker.
+#
+#   docker compose up checker                 # scan configs -> NDJSON + dashboard
+#   docker compose up dashboard               # serve the lightweight dashboard :8000
+#   docker compose --profile splunk up -d     # ALSO bring up real Splunk :8001
+#
+# The lightweight path (checker + dashboard) is intentionally tiny and runs
+# anywhere, including resource-limited Killercoda nodes. The `splunk` profile is
+# opt-in because Splunk Enterprise needs ~1GB+ RAM.
+# =============================================================================
+
+services:
+
+  # ---- run one compliance scan, write NDJSON where the dashboard + Splunk read it
+  checker:
+    build: .
+    image: nxos-compliance-checker:latest
+    volumes:
+      - ./configs:/configs:ro
+      - ./output:/output
+    command: >
+      --config-dir /configs
+      --policy policy/nxos_policy.yaml
+      --format ndjson
+      --output /output/compliance.ndjson
+
+  # ---- zero-dependency dashboard: static server over dashboard/ + output/
+  # index.html fetches ./output/compliance.ndjson (see dashboard/index.html).
+  dashboard:
+    image: python:3.12-slim
+    working_dir: /web
+    volumes:
+      - ./dashboard:/web:ro
+      - ./output:/web/output:ro
+    command: ["python3", "-m", "http.server", "8000"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      - checker
+
+  # ---- OPTIONAL real Splunk (profile: splunk) --------------------------------
+  splunk:
+    profiles: ["splunk"]
+    image: splunk/splunk:latest
+    hostname: splunk
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD: "${SPLUNK_PASSWORD:-Changeme123!}"
+    ports:
+      - "8001:8000"   # Splunk web UI (host 8001 to avoid clashing with dashboard)
+      - "8088:8088"   # HEC (optional)
+    volumes:
+      - ./output:/opt/nxos-compliance/output:ro
+      - ./splunk/props.conf:/opt/splunk/etc/system/local/props.conf:ro
+      - ./splunk/inputs.conf:/opt/splunk/etc/system/local/inputs.conf:ro
+      - splunk-var:/opt/splunk/var
+      - splunk-etc:/opt/splunk/etc
+
+volumes:
+  splunk-var:
+  splunk-etc:

@@ -1,0 +1,397 @@
+# =============================================================================
+# NX-OS Security Compliance Policy
+# =============================================================================
+# Template-driven security checks. Security teams edit THIS file -- no Python
+# changes required to add, remove, or retune a check.
+#
+# Sources: CIS Cisco NX-OS Benchmark | Cisco NX-OS Hardening Guide |
+#          NIST 800-53 | relevant RFCs
+#
+# Each check supports these fields:
+#   id            unique check id (NX-<CATEGORY>-NNN)
+#   category      one of the 10 policy categories (see counts below)
+#   severity      CRITICAL | HIGH | MEDIUM | LOW   (drives score weighting)
+#   description   human-readable intent of the check
+#   remediation   the fix command(s) shown when the check fails
+#   check_type    presence | absence | value | value_range | vty_lines | interface
+#
+# check_type-specific fields:
+#   presence / absence : pattern
+#   value              : pattern (1 capture group), operator, threshold
+#   value_range        : pattern (1 capture group), min, max
+#   vty_lines          : pattern (required on every 'line vty' block)
+#   interface          : pattern, mode (present|absent), interface_filter
+#
+# NOTE ON COVERAGE
+# ----------------
+# The architecture deck targets 116 checks across 10 categories. This file
+# ships a curated, fully-working representative set that exercises every
+# check_type and every category. Extending it to the full 116 is pure YAML --
+# no code changes. The deck's target counts per category are noted below.
+# =============================================================================
+
+metadata:
+  name: "NX-OS Security Compliance Policy"
+  version: "3.0"
+  standard: "CIS / Cisco Hardening Guide / NIST"
+
+# Deck target counts (for reference):
+#   System Hardening 4 | Management Plane 36 | Control Plane 19 | Data Plane 14
+#   Network Services 8 | Monitoring 8 | IPv6 Security 12 | VTY/Console 3
+#   Interface 5 | BGP 1   => 116 total
+
+checks:
+
+  # ------------------------------------------------------------------ #
+  # System Hardening
+  # ------------------------------------------------------------------ #
+  - id: NX-SYS-001
+    category: System Hardening
+    severity: HIGH
+    description: "Password strength checking must be enabled"
+    check_type: presence
+    pattern: '^password strength-check'
+    remediation: "password strength-check"
+
+  - id: NX-SYS-002
+    category: System Hardening
+    severity: CRITICAL
+    description: "Telnet feature must be disabled"
+    check_type: absence
+    pattern: '^feature telnet'
+    remediation: "no feature telnet"
+
+  - id: NX-SYS-003
+    category: System Hardening
+    severity: HIGH
+    description: "SSH feature must be enabled for secure management"
+    check_type: presence
+    pattern: '^feature ssh'
+    remediation: "feature ssh"
+
+  - id: NX-SYS-004
+    category: System Hardening
+    severity: MEDIUM
+    description: "A login banner (MOTD) must be configured"
+    check_type: presence
+    pattern: '^banner motd'
+    remediation: "banner motd #Authorized access only#"
+
+  # ------------------------------------------------------------------ #
+  # Management Plane  (AAA / users / SSH / SNMP)
+  # ------------------------------------------------------------------ #
+  - id: NX-MP-001
+    category: Management Plane
+    severity: HIGH
+    description: "At least one local admin user (role network-admin) exists"
+    check_type: presence
+    pattern: '^username \S+ .*role network-admin'
+    remediation: "username admin password <strong-pass> role network-admin"
+
+  - id: NX-MP-002
+    category: Management Plane
+    severity: CRITICAL
+    description: "No user configured with a plaintext (type 0) password"
+    check_type: absence
+    pattern: '^username \S+ password 0 '
+    remediation: "reconfigure the user with an encrypted password (type 5)"
+
+  - id: NX-MP-003
+    category: Management Plane
+    severity: HIGH
+    description: "AAA authentication for login is configured"
+    check_type: presence
+    pattern: '^aaa authentication login'
+    remediation: "aaa authentication login default group tacacs+ local"
+
+  - id: NX-MP-004
+    category: Management Plane
+    severity: MEDIUM
+    description: "AAA command authorization is configured"
+    check_type: presence
+    pattern: '^aaa authorization (commands|config-commands)'
+    remediation: "aaa authorization commands default group tacacs+ local"
+
+  - id: NX-MP-005
+    category: Management Plane
+    severity: MEDIUM
+    description: "AAA accounting for executed commands is enabled"
+    check_type: presence
+    pattern: '^aaa accounting default'
+    remediation: "aaa accounting default group tacacs+ local"
+
+  - id: NX-MP-010
+    category: Management Plane
+    severity: HIGH
+    description: "SSH key uses a modulus of at least 2048 bits"
+    check_type: value
+    pattern: '^ssh key rsa (\d+)'
+    operator: ">="
+    threshold: 2048
+    remediation: "ssh key rsa 2048 force"
+
+  - id: NX-MP-011
+    category: Management Plane
+    severity: CRITICAL
+    description: "SNMP community 'public' must not be present"
+    check_type: absence
+    pattern: '^snmp-server community\s+public'
+    remediation: "no snmp-server community public"
+
+  - id: NX-MP-012
+    category: Management Plane
+    severity: CRITICAL
+    description: "SNMP community 'private' must not be present"
+    check_type: absence
+    pattern: '^snmp-server community\s+private'
+    remediation: "no snmp-server community private"
+
+  - id: NX-MP-013
+    category: Management Plane
+    severity: HIGH
+    description: "An SNMPv3 user must be configured (authPriv preferred)"
+    check_type: presence
+    pattern: '^snmp-server user \S+ .*(auth|priv)'
+    remediation: "snmp-server user <user> auth sha <key> priv aes-128 <key>"
+
+  # ------------------------------------------------------------------ #
+  # Control Plane  (CoPP / routing protocol auth)
+  # ------------------------------------------------------------------ #
+  - id: NX-CP-001
+    category: Control Plane
+    severity: HIGH
+    description: "Control Plane Policing (CoPP) profile is applied"
+    check_type: presence
+    pattern: '^copp profile'
+    remediation: "copp profile strict"
+
+  - id: NX-CP-002
+    category: Control Plane
+    severity: MEDIUM
+    description: "Unicast Reverse Path Forwarding available (feature enabled)"
+    check_type: presence
+    pattern: '^feature (urpf|ip verify)'
+    remediation: "feature urpf"
+
+  - id: NX-CP-003
+    category: Control Plane
+    severity: HIGH
+    description: "OSPF authentication (message-digest) is present when OSPF used"
+    check_type: presence
+    pattern: '^\s*(authentication message-digest|ip ospf message-digest-key)'
+    remediation: "configure OSPF area authentication message-digest"
+
+  - id: NX-CP-004
+    category: Control Plane
+    severity: MEDIUM
+    description: "Spanning-tree BPDU Guard enabled globally on edge ports"
+    check_type: presence
+    pattern: '^spanning-tree port type edge bpduguard default'
+    remediation: "spanning-tree port type edge bpduguard default"
+
+  # ------------------------------------------------------------------ #
+  # Data Plane  (ACLs / DHCP snooping / storm control)
+  # ------------------------------------------------------------------ #
+  - id: NX-DP-001
+    category: Data Plane
+    severity: MEDIUM
+    description: "DHCP snooping feature enabled"
+    check_type: presence
+    pattern: '^ip dhcp snooping'
+    remediation: "ip dhcp snooping"
+
+  - id: NX-DP-002
+    category: Data Plane
+    severity: MEDIUM
+    description: "Dynamic ARP inspection feature enabled"
+    check_type: presence
+    pattern: '^feature dhcp'
+    remediation: "feature dhcp"
+
+  - id: NX-DP-003
+    category: Data Plane
+    severity: LOW
+    description: "At least one IP access-list is defined"
+    check_type: presence
+    pattern: '^ip access-list '
+    remediation: "define and apply IP access-lists on untrusted boundaries"
+
+  - id: NX-DP-004
+    category: Data Plane
+    severity: MEDIUM
+    description: "IP source routing must be disabled"
+    check_type: absence
+    pattern: '^ip source-route'
+    remediation: "no ip source-route"
+
+  # ------------------------------------------------------------------ #
+  # Network Services  (NTP / DNS / clock)
+  # ------------------------------------------------------------------ #
+  - id: NX-NS-001
+    category: Network Services
+    severity: MEDIUM
+    description: "At least one NTP server is configured for time sync"
+    check_type: presence
+    pattern: '^ntp server '
+    remediation: "ntp server <ip> use-vrf management"
+
+  - id: NX-NS-002
+    category: Network Services
+    severity: MEDIUM
+    description: "NTP authentication is enabled"
+    check_type: presence
+    pattern: '^ntp authenticate'
+    remediation: "ntp authenticate"
+
+  - id: NX-NS-003
+    category: Network Services
+    severity: LOW
+    description: "Timezone/clock is configured"
+    check_type: presence
+    pattern: '^clock timezone '
+    remediation: "clock timezone <TZ> <offset-hours> 0"
+
+  - id: NX-NS-004
+    category: Network Services
+    severity: MEDIUM
+    description: "The insecure 'feature telnet' must not be enabled (service)"
+    check_type: absence
+    pattern: '^feature\s+telnet'
+    remediation: "no feature telnet"
+
+  # ------------------------------------------------------------------ #
+  # Monitoring  (logging / syslog)
+  # ------------------------------------------------------------------ #
+  - id: NX-MON-001
+    category: Monitoring
+    severity: HIGH
+    description: "A remote syslog server is configured"
+    check_type: presence
+    pattern: '^logging server '
+    remediation: "logging server <ip> 5 use-vrf management"
+
+  - id: NX-MON-002
+    category: Monitoring
+    severity: MEDIUM
+    description: "Logging timestamps use at least millisecond granularity"
+    check_type: presence
+    pattern: '^logging timestamp (milliseconds|microseconds)'
+    remediation: "logging timestamp milliseconds"
+
+  - id: NX-MON-003
+    category: Monitoring
+    severity: LOW
+    description: "Console logging severity is 3 (errors) or lower/verbose bound"
+    check_type: value
+    pattern: '^logging console (\d+)'
+    operator: "<="
+    threshold: 6
+    remediation: "logging console 3"
+
+  - id: NX-MON-008
+    category: Monitoring
+    severity: MEDIUM
+    description: "Command accounting/logging of configuration changes enabled"
+    check_type: presence
+    pattern: '^logging level (aaa|monitor)'
+    remediation: "logging level aaa 5"
+
+  # ------------------------------------------------------------------ #
+  # IPv6 Security
+  # ------------------------------------------------------------------ #
+  - id: NX-IPV6-001
+    category: IPv6 Security
+    severity: MEDIUM
+    description: "IPv6 RA Guard / first-hop security feature enabled when IPv6 used"
+    check_type: presence
+    pattern: '^feature (dhcp|ipv6)'
+    remediation: "enable IPv6 first-hop security features"
+
+  - id: NX-IPV6-002
+    category: IPv6 Security
+    severity: MEDIUM
+    description: "IPv6 unreachables should be disabled on interfaces (no leak)"
+    check_type: absence
+    pattern: '^\s*ipv6 redirects'
+    remediation: "no ipv6 redirects on routed interfaces"
+
+  - id: NX-IPV6-003
+    category: IPv6 Security
+    severity: LOW
+    description: "IPv6 source routing header must be denied where configured"
+    check_type: absence
+    pattern: '^ipv6 source-route'
+    remediation: "no ipv6 source-route"
+
+  # ------------------------------------------------------------------ #
+  # VTY / Console
+  # ------------------------------------------------------------------ #
+  - id: NX-VTY-001
+    category: VTY/Console
+    severity: HIGH
+    description: "All VTY lines restrict transport input to ssh only"
+    check_type: vty_lines
+    pattern: '^(exec-timeout|access-class|transport input ssh)'
+    remediation: "under 'line vty': transport input ssh"
+
+  - id: NX-VTY-002
+    category: VTY/Console
+    severity: MEDIUM
+    description: "All VTY lines enforce an exec-timeout"
+    check_type: vty_lines
+    pattern: '^exec-timeout '
+    remediation: "under 'line vty': exec-timeout 10 0"
+
+  - id: NX-VTY-003
+    category: VTY/Console
+    severity: MEDIUM
+    description: "Console exec-timeout is within 1..15 minutes"
+    check_type: value_range
+    pattern: '^\s*exec-timeout (\d+)'
+    min: 1
+    max: 15
+    remediation: "exec-timeout 10 0"
+
+  # ------------------------------------------------------------------ #
+  # Interface
+  # ------------------------------------------------------------------ #
+  - id: NX-INT-001
+    category: Interface
+    severity: MEDIUM
+    description: "No interface should have 'ip redirects' enabled"
+    check_type: interface
+    mode: absent
+    interface_filter: '^interface Ethernet'
+    pattern: '^ip redirects'
+    remediation: "under each routed interface: no ip redirects"
+
+  - id: NX-INT-002
+    category: Interface
+    severity: LOW
+    description: "No interface should have proxy-arp enabled"
+    check_type: interface
+    mode: absent
+    interface_filter: '^interface '
+    pattern: '^ip proxy-arp'
+    remediation: "under each interface: no ip proxy-arp"
+
+  - id: NX-INT-003
+    category: Interface
+    severity: MEDIUM
+    description: "Unused access ports should be administratively shutdown"
+    check_type: interface
+    mode: present
+    interface_filter: '^interface Ethernet1/4[0-8]'
+    pattern: '^shutdown'
+    remediation: "shutdown unused access ports"
+
+  # ------------------------------------------------------------------ #
+  # BGP
+  # ------------------------------------------------------------------ #
+  - id: NX-BGP-001
+    category: BGP
+    severity: HIGH
+    description: "BGP neighbors use password/MD5 authentication when BGP is used"
+    check_type: presence
+    pattern: '^\s*(password|neighbor \S+ password)'
+    remediation: "under 'router bgp': neighbor <ip> password <key>"

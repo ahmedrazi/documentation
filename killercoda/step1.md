@@ -1,9 +1,11 @@
 # Install & run your first scan
 
-The project has been cloned to `/root/documentation`. Move into it:
+The project has been cloned from
+[techiescamp/devops-projects](https://github.com/techiescamp/devops-projects)
+and is available at `/root/nxos-compliance`. Move into it:
 
 ```bash
-cd /root/documentation
+cd /root/nxos-compliance
 ```{{exec}}
 
 Install dependencies and run the first scan in one step:

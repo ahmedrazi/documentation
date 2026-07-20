@@ -6,7 +6,7 @@ Python.** Let's add a check.
 Open the policy:
 
 ```bash
-cd /root/documentation
+cd /root/nxos-compliance
 cat policy/nxos_policy.yaml | head -60
 ```{{exec}}
 

@@ -12,7 +12,7 @@ You deployed the **entire** NX-OS compliance stack on a single Linux box:
 
 - **Real Splunk:** `docker compose --profile splunk up -d` then load
   `splunk/nxos_compliance_dashboard.xml`.
-- **Automate:** cron the scan — `*/30 * * * * cd /root/documentation && make scan`.
+- **Automate:** cron the scan — `*/30 * * * * cd /root/nxos-compliance && make scan`.
 - **CI gate:** `python3 src/nxos_compliance_checker.py --config-dir configs --fail-under 80`
   exits non-zero if any device drops below 80%.
 - **Scale the policy:** add checks in `policy/nxos_policy.yaml` toward full
